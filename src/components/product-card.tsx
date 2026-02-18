@@ -1,11 +1,11 @@
-import type { Product } from "@/types";
-import Image from "next/image";
-import { Card, CardContent } from "@/components/ui/card";
-import { formatPrice } from "@/lib/utils";
+import type { Product } from '@/types';
+import Image from 'next/image';
+import { Card, CardContent } from '@/components/ui/card';
+import { formatPrice } from '@/lib/utils';
 
 export function ProductCard({ product }: { product: Product }) {
   return (
-    <Card className="w-full h-full overflow-hidden border-none shadow-lg transition-transform duration-300 group-hover:scale-105 group-hover:shadow-2xl bg-card">
+    <Card className="w-full h-full overflow-hidden border border-primary/20 hover:border-primary/50 shadow-lg transition-all duration-300 group-hover:scale-105 group-hover:shadow-2xl bg-card">
       <div className="aspect-[3/4] relative">
         <Image
           src={product.imageUrl}
@@ -17,7 +17,9 @@ export function ProductCard({ product }: { product: Product }) {
       </div>
       <CardContent className="p-4">
         <h3 className="font-headline text-lg truncate">{product.name}</h3>
-        <p className="font-semibold text-primary">{formatPrice(product.price)}</p>
+        <p className="font-semibold text-primary">
+          {formatPrice(product.price)}
+        </p>
       </CardContent>
     </Card>
   );
