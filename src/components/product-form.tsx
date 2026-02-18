@@ -132,7 +132,7 @@ export function ProductForm() {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <>
+                        <div>
                           <label htmlFor="image-upload" className="cursor-pointer">
                             <Card
                               className={`aspect-square w-full flex items-center justify-center flex-col gap-2 ${
@@ -152,7 +152,7 @@ export function ProductForm() {
                             </Card>
                           </label>
                           <Input id="image-upload" type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
-                        </>
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
