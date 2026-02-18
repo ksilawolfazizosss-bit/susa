@@ -1,3 +1,92 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "susan-gown-01",
+      "type": "product",
+      "description": "A stunning evening gown in deep black, crafted from luxurious velvet with a flowing silhouette. It features a daring side slit and intricate beadwork on the bodice.",
+      "imageUrl": "https://images.unsplash.com/photo-1761574028720-8872dc5fe412?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxldmVuaW5nJTIwZ293biUyMGJsYWNrfGVufDB8fHx8MTc3MTQzOTQ0NHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "evening gown black",
+      "name": "Midnight Velvet Gown",
+      "price": 750,
+      "sizes": [
+        "S",
+        "M",
+        "L",
+        "XL"
+      ],
+      "colors": [
+        {
+          "name": "Black",
+          "hex": "#0C0C0C"
+        },
+        {
+          "name": "Burgundy",
+          "hex": "#800020"
+        }
+      ]
+    },
+    {
+      "id": "susan-bag-01",
+      "type": "product",
+      "description": "A classic tote crafted from genuine Italian leather. This handbag boasts a spacious interior, gold-plated hardware, and a detachable shoulder strap for versatile styling.",
+      "imageUrl": "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxsZWF0aGVyJTIwaGFuZGJhZ3xlbnwwfHx8fDE3NzE0MTU5OTl8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "leather handbag",
+      "name": "Elegance Leather Tote",
+      "price": 420,
+      "sizes": [],
+      "colors": [
+        {
+          "name": "Tan",
+          "hex": "#D2B48C"
+        },
+        {
+          "name": "Black",
+          "hex": "#0C0C0C"
+        }
+      ]
+    },
+    {
+      "id": "susan-dress-01",
+      "type": "product",
+      "description": "Embrace sunny days with this beautiful floral midi dress. Made from lightweight cotton, it features a smocked bodice, puff sleeves, and a tiered skirt for a romantic look.",
+      "imageUrl": "https://images.unsplash.com/photo-1549990995-e13a11e69b6d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8ZmxvcmFsJTIwZHJlc3N8ZW58MHx8fHwxNzcxMzY3NzgxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "floral dress",
+      "name": "Garden Party Midi Dress",
+      "price": 280,
+      "sizes": [
+        "XS",
+        "S",
+        "M",
+        "L"
+      ],
+      "colors": [
+        {
+          "name": "Ivory",
+          "hex": "#FFFFF0"
+        }
+      ]
+    },
+    {
+      "id": "susan-heels-01",
+      "type": "product",
+      "description": "Elevate any outfit with these stunning gold stiletto heels. Featuring a delicate ankle strap and a pointed toe, they are the perfect statement piece for a night out.",
+      "imageUrl": "https://images.unsplash.com/photo-1534653299134-96a171b61581?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxnb2xkJTIwaGVlbHN8ZW58MHx8fHwxNzcxNDM5NDQ1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "gold heels",
+      "name": "Golden Stiletto Heels",
+      "price": 350,
+      "sizes": [
+        "6",
+        "7",
+        "8",
+        "9",
+        "10"
+      ],
+      "colors": [
+        {
+          "name": "Gold",
+          "hex": "#D4AF37"
+        }
+      ]
+    }
+  ]
 }
