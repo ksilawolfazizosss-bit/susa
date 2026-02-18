@@ -10,11 +10,15 @@ import { Separator } from "@/components/ui/separator";
 import { PlaceHolderImages, type ImagePlaceholder } from "@/lib/placeholder-images";
 import { useToast } from "@/hooks/use-toast";
 import { deleteProduct as deleteProductAction } from "@/app/actions/product";
+import { OrderList } from "@/components/order-list";
+import { PlaceholderOrders } from "@/lib/placeholder-orders";
 
 export default function AdminPage() {
   const [products, setProducts] = useState<ImagePlaceholder[]>(
     PlaceHolderImages.filter((p) => p.type === 'product')
   );
+  // For now, orders are static. Later they will come from a database.
+  const [orders] = useState(PlaceholderOrders);
   const { toast } = useToast();
 
   const handleAddProduct = (newProductData: ProductFormValues) => {
@@ -89,6 +93,12 @@ export default function AdminPage() {
 
           <div>
             <ProductList products={products} onProductDelete={handleDeleteProduct} />
+          </div>
+
+          <Separator />
+          
+          <div>
+            <OrderList orders={orders} />
           </div>
         </div>
       </main>
