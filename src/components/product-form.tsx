@@ -20,7 +20,6 @@ import Image from "next/image";
 import { ImagePlus, Sparkles, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { optimizeProductImage } from "@/ai/flows/product-image-optimizer-flow";
 import { generateProductDescription } from "@/ai/flows/product-description-generator-flow";
 
 const formSchema = z.object({
@@ -56,26 +55,31 @@ export function ProductForm() {
     },
   });
 
-  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     setIsImageLoading(true);
     const reader = new FileReader();
     reader.readAsDataURL(file);
-    reader.onload = async () => {
+    reader.onload = () => {
       const dataUri = reader.result as string;
-      try {
-        const result = await optimizeProductImage({ photoDataUri: dataUri });
-        form.setValue("image", result.optimizedPhotoDataUri, { shouldValidate: true });
-        setImagePreview(result.optimizedPhotoDataUri);
-        toast({ title: "Image Optimized", description: "AI has enhanced your product image." });
-      } catch (error) {
-        console.error("Image optimization error:", error);
-        toast({ variant: "destructive", title: "Error", description: "Could not optimize the image." });
-      } finally {
-        setIsImageLoading(false);
-      }
+      form.setValue("image", dataUri, { shouldValidate: true });
+      setImagePreview(dataUri);
+      toast({
+        title: "Image Uploaded",
+        description: "Your product image has been loaded.",
+      });
+      setIsImageLoading(false);
+    };
+    reader.onerror = (error) => {
+      console.error("File reading error:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Could not read the image file.",
+      });
+      setIsImageLoading(false);
     };
   };
 
