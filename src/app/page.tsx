@@ -6,6 +6,7 @@ import { Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Footer } from '@/components/footer';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 const products = PlaceHolderImages.filter((p) => p.type === 'product');
 
@@ -24,11 +25,21 @@ export default function Home() {
         </div>
         <Suspense fallback={<ProductGridSkeleton />}>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
-            {products.map((product) => (
-              <Link href={`/products/${product.id}`} key={product.id} className="group">
-                <ProductCard product={product} />
-              </Link>
-            ))}
+            {products.length > 0 ? (
+              products.map((product) => (
+                <Link href={`/products/${product.id}`} key={product.id} className="group">
+                  <ProductCard product={product} />
+                </Link>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-16">
+                <h2 className="font-headline text-2xl mb-2">The Collection is Awaiting Your Masterpieces</h2>
+                <p className="text-muted-foreground mb-4">Your store is ready. Go to the admin panel to add your first product.</p>
+                <Button asChild variant="secondary">
+                    <Link href="/admin">Go to Admin Panel</Link>
+                </Button>
+              </div>
+            )}
           </div>
         </Suspense>
       </main>

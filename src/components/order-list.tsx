@@ -12,11 +12,14 @@ export function OrderList({ orders }: { orders: Order[] }) {
     <div className="space-y-6">
       <h2 className="text-2xl font-headline mb-1">Recent Orders</h2>
       <p className="text-muted-foreground mb-6">
-        This is a preview of your orders dashboard. Real orders will appear here once a database is connected.
+        View incoming orders from your customers.
       </p>
       {orders.length === 0 ? (
         <Card className="flex items-center justify-center h-40 border-dashed">
-          <p className="text-muted-foreground">No orders to display.</p>
+          <div className="text-center text-muted-foreground">
+            <p>No orders to display.</p>
+            <p className="text-sm">New orders will appear here once the site is connected to a database.</p>
+          </div>
         </Card>
       ) : (
         <div className="space-y-4">

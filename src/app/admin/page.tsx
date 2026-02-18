@@ -4,21 +4,22 @@ import { useState } from "react";
 import { ProductForm, type ProductFormValues } from "@/components/product-form";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Package, ShoppingCart } from "lucide-react";
 import { ProductList } from "@/components/product-list";
 import { Separator } from "@/components/ui/separator";
 import { PlaceHolderImages, type ImagePlaceholder } from "@/lib/placeholder-images";
 import { useToast } from "@/hooks/use-toast";
 import { deleteProduct as deleteProductAction } from "@/app/actions/product";
 import { OrderList } from "@/components/order-list";
-import { PlaceholderOrders } from "@/lib/placeholder-orders";
+import { PlaceholderOrders, type Order } from "@/lib/placeholder-orders";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 
 export default function AdminPage() {
   const [products, setProducts] = useState<ImagePlaceholder[]>(
     PlaceHolderImages.filter((p) => p.type === 'product')
   );
-  // For now, orders are static. Later they will come from a database.
-  const [orders] = useState(PlaceholderOrders);
+  const [orders] = useState<Order[]>(PlaceholderOrders);
   const { toast } = useToast();
 
   const handleAddProduct = (newProductData: ProductFormValues) => {
@@ -82,25 +83,36 @@ export default function AdminPage() {
         </div>
       </header>
       <main className="container mx-auto py-8 px-4">
-        <div className="max-w-4xl mx-auto space-y-12">
-          <div>
-            <h2 className="text-2xl font-headline mb-1">Add New Product</h2>
-            <p className="text-muted-foreground mb-6">Fill in the details below to add a new product to your store.</p>
-            <ProductForm onProductAdd={handleAddProduct} />
-          </div>
+        <Tabs defaultValue="products" className="max-w-4xl mx-auto">
+            <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="products">
+                    <Package className="mr-2" />
+                    Products
+                </TabsTrigger>
+                <TabsTrigger value="orders">
+                    <ShoppingCart className="mr-2" />
+                    Orders
+                </TabsTrigger>
+            </TabsList>
+            <TabsContent value="products" className="mt-6 space-y-12">
+                 <div>
+                    <h2 className="text-2xl font-headline mb-1">Add New Product</h2>
+                    <p className="text-muted-foreground mb-6">Fill in the details below to add a new product to your store.</p>
+                    <ProductForm onProductAdd={handleAddProduct} />
+                </div>
 
-          <Separator />
+                <Separator />
 
-          <div>
-            <ProductList products={products} onProductDelete={handleDeleteProduct} />
-          </div>
-
-          <Separator />
-          
-          <div>
-            <OrderList orders={orders} />
-          </div>
-        </div>
+                <div>
+                    <ProductList products={products} onProductDelete={handleDeleteProduct} />
+                </div>
+            </TabsContent>
+            <TabsContent value="orders" className="mt-6">
+                <div>
+                    <OrderList orders={orders} />
+                </div>
+            </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
