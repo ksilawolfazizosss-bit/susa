@@ -2,7 +2,8 @@ import { ProductForm } from "@/components/product-form";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { useAuth } from "@/context/auth-context";
+import { ProductList } from "@/components/product-list";
+import { Separator } from "@/components/ui/separator";
 
 
 export default function AdminPage() {
@@ -21,10 +22,18 @@ export default function AdminPage() {
         </div>
       </header>
       <main className="container mx-auto py-8 px-4">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto space-y-12">
+          <div>
             <h2 className="text-2xl font-headline mb-1">Add New Product</h2>
             <p className="text-muted-foreground mb-6">Fill in the details below to add a new product to your store.</p>
             <ProductForm />
+          </div>
+
+          <Separator />
+
+          <div>
+            <ProductList />
+          </div>
         </div>
       </main>
     </div>
