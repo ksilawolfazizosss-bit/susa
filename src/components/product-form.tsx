@@ -33,9 +33,9 @@ const formSchema = z.object({
   image: z.string().url("A valid image URL is required."),
 });
 
-type ProductFormValues = z.infer<typeof formSchema>;
+export type ProductFormValues = z.infer<typeof formSchema>;
 
-export function ProductForm() {
+export function ProductForm({ onProductAdd }: { onProductAdd: (data: ProductFormValues) => void }) {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isImageLoading, setIsImageLoading] = useState(false);
   const [isDescriptionLoading, setIsDescriptionLoading] = useState(false);
@@ -112,12 +112,7 @@ export function ProductForm() {
   };
 
   function onSubmit(values: ProductFormValues) {
-    // In a real app, this would send data to a backend to save in a database.
-    console.log("Product submitted (simulation):", values);
-    toast({
-      title: "Product Published!",
-      description: "Your new product is now live in the store (simulation).",
-    });
+    onProductAdd(values);
     form.reset();
     setImagePreview(null);
   }

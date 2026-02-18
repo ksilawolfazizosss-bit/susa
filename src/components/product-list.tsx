@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from 'react';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { type ImagePlaceholder } from '@/lib/placeholder-images';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Trash2 } from 'lucide-react';
@@ -18,33 +17,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { useToast } from '@/hooks/use-toast';
-import { deleteProduct } from '@/app/actions/product';
 
-export function ProductList() {
-  const initialProducts = PlaceHolderImages.filter((p) => p.type === 'product');
-  const [products, setProducts] = useState(initialProducts);
-  const { toast } = useToast();
-
-  const handleDelete = async (productId: string) => {
-    const result = await deleteProduct(productId);
-    if (result.success) {
-      // Optimistically update the UI.
-      setProducts((currentProducts) =>
-        currentProducts.filter((p) => p.id !== productId)
-      );
-      toast({
-        title: 'Product Deleted (Simulation)',
-        description: `The product has been removed. This will reset on page refresh.`,
-      });
-    } else {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: result.message || 'Could not delete the product.',
-      });
-    }
-  };
+export function ProductList({ products, onProductDelete }: { products: ImagePlaceholder[], onProductDelete: (productId: string) => void }) {
 
   return (
     <div className="space-y-6">
@@ -84,7 +58,7 @@ export function ProductList() {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => handleDelete(product.id)}>
+                      <AlertDialogAction onClick={() => onProductDelete(product.id)}>
                         Continue
                       </AlertDialogAction>
                     </AlertDialogFooter>
