@@ -7,62 +7,80 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Package, ShoppingCart } from "lucide-react";
 import { ProductList } from "@/components/product-list";
 import { Separator } from "@/components/ui/separator";
-import { PlaceHolderImages, type ImagePlaceholder } from "@/lib/placeholder-images";
 import { useToast } from "@/hooks/use-toast";
-import { deleteProduct as deleteProductAction } from "@/app/actions/product";
 import { OrderList } from "@/components/order-list";
-import { PlaceholderOrders, type Order } from "@/lib/placeholder-orders";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
+import { useCollection } from "@/firebase/firestore/use-collection";
+import { collection, addDoc, deleteDoc, doc } from "firebase/firestore";
+import { useFirestore } from "@/firebase";
+import type { Product, Order } from "@/types";
+import { errorEmitter } from "@/firebase/error-emitter";
+import { FirestorePermissionError } from "@/firebase/errors";
 
 export default function AdminPage() {
-  const [products, setProducts] = useState<ImagePlaceholder[]>(
-    PlaceHolderImages.filter((p) => p.type === 'product')
+  const firestore = useFirestore();
+  const { data: products, loading: productsLoading } = useCollection<Product>(
+    firestore ? collection(firestore, "products") : null
   );
-  const [orders] = useState<Order[]>(PlaceholderOrders);
+  const { data: orders, loading: ordersLoading } = useCollection<Order>(
+    firestore ? collection(firestore, "orders") : null
+  );
+
   const { toast } = useToast();
 
-  const handleAddProduct = (newProductData: ProductFormValues) => {
-    // In a real app, this would be an API call to create the product.
-    // For this simulation, we'll create a new product object and add it to our state.
-    const newProduct: ImagePlaceholder = {
-      id: `new-product-${Date.now()}`, // Simple unique ID for simulation
-      type: 'product',
-      name: newProductData.name,
-      price: newProductData.price,
-      description: newProductData.description,
-      imageUrl: newProductData.image,
-      imageHint: newProductData.category.toLowerCase(), // Use category as a hint
-      sizes: newProductData.sizes?.split(',').map(s => s.trim()).filter(Boolean),
-      // For colors, we're simplifying and won't parse hex codes here.
-      // In a real app, this would need a more robust UI/system.
-      colors: newProductData.colors?.split(',').map(c => ({ name: c.trim(), hex: '#000000' })).filter(c => c.name),
-    };
+  const handleAddProduct = async (newProductData: ProductFormValues) => {
+    if (!firestore) return;
 
-    setProducts(prevProducts => [newProduct, ...prevProducts]);
+    try {
+      const productCollection = collection(firestore, "products");
+      const docRef = await addDoc(productCollection, {
+        name: newProductData.name,
+        price: newProductData.price,
+        category: newProductData.category,
+        description: newProductData.description,
+        imageUrl: newProductData.image,
+        sizes: newProductData.sizes?.split(',').map(s => s.trim()).filter(Boolean) || [],
+        colors: newProductData.colors?.split(',').map(c => c.trim()).filter(Boolean) || [],
+        keyFeatures: newProductData.keyFeatures?.split(',').map(s => s.trim()).filter(Boolean) || [],
+      });
 
-    toast({
-      title: "Product Published!",
-      description: "Your new product is now live in the store (simulation). This will reset on page refresh.",
-    });
+      toast({
+        title: "Product Published!",
+        description: "Your new product is now live in the store.",
+      });
+    } catch (err) {
+      const permissionError = new FirestorePermissionError({
+          path: 'products',
+          operation: 'create',
+      });
+      errorEmitter.emit('permission-error', permissionError);
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: "Could not add product. Check permissions.",
+      });
+    }
   };
 
   const handleDeleteProduct = async (productId: string) => {
-    // This uses the existing Server Action but updates the state on this page.
-    const result = await deleteProductAction(productId);
-    if (result.success) {
-      setProducts((currentProducts) =>
-        currentProducts.filter((p) => p.id !== productId)
-      );
+    if (!firestore) return;
+
+    try {
+      await deleteDoc(doc(firestore, "products", productId));
       toast({
-        title: 'Product Deleted (Simulation)',
-        description: `The product has been removed. This will reset on page refresh.`,
+        title: 'Product Deleted',
+        description: `The product has been removed from the store.`,
       });
-    } else {
+    } catch (err) {
+      const permissionError = new FirestorePermissionError({
+          path: `products/${productId}`,
+          operation: 'delete',
+      });
+      errorEmitter.emit('permission-error', permissionError);
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: result.message || 'Could not delete the product.',
+        description: 'Could not delete the product. Check permissions.',
       });
     }
   };
@@ -104,12 +122,12 @@ export default function AdminPage() {
                 <Separator />
 
                 <div>
-                    <ProductList products={products} onProductDelete={handleDeleteProduct} />
+                    <ProductList products={products || []} onProductDelete={handleDeleteProduct} loading={productsLoading} />
                 </div>
             </TabsContent>
             <TabsContent value="orders" className="mt-6">
                 <div>
-                    <OrderList orders={orders} />
+                    <OrderList orders={orders || []} loading={ordersLoading} />
                 </div>
             </TabsContent>
         </Tabs>

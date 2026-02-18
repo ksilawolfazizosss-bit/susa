@@ -1,0 +1,102 @@
+{
+  "entities": {
+    "Product": {
+      "title": "Product",
+      "description": "Represents a product in the fashion store.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the product."
+        },
+        "price": {
+          "type": "number",
+          "description": "The price of the product."
+        },
+        "category": {
+          "type": "string",
+          "description": "The category of the product."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of the product."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "The URL of the product image."
+        },
+        "keyFeatures": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "A list of key features of the product."
+        },
+        "sizes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Available sizes for the product."
+        },
+        "colors": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Available colors for the product."
+        }
+      },
+      "required": ["name", "price", "description", "imageUrl"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Represents a customer order.",
+      "type": "object",
+      "properties": {
+        "customerName": {
+          "type": "string",
+          "description": "The full name of the customer."
+        },
+        "phone": {
+          "type": "string",
+          "description": "The customer's phone number."
+        },
+        "productId": {
+          "type": "string",
+          "description": "The ID of the purchased product."
+        },
+        "productName": {
+          "type": "string",
+          "description": "The name of the purchased product."
+        },
+        "productPrice": {
+          "type": "number",
+          "description": "The price of the purchased product."
+        },
+        "productImageUrl": {
+          "type": "string",
+          "description": "The image URL of the purchased product."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The timestamp when the order was created."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["Pending", "Completed"],
+          "description": "The status of the order."
+        }
+      },
+      "required": ["customerName", "phone", "productId", "productName", "productPrice", "createdAt", "status"]
+    }
+  },
+  "auth": {
+    "providers": []
+  },
+  "firestore": {
+    "/products/{productId}": {
+      "schema": { "$ref": "#/entities/Product" },
+      "description": "Stores all product information."
+    },
+    "/orders/{orderId}": {
+      "schema": { "$ref": "#/entities/Order" },
+      "description": "Stores all customer orders."
+    }
+  }
+}

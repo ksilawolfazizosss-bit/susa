@@ -1,5 +1,6 @@
-import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { notFound } from 'next/navigation';
+'use client';
+
+import { notFound, useParams } from 'next/navigation';
 import Image from 'next/image';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
@@ -8,10 +9,24 @@ import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { formatPrice } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
+import { useFirestore } from '@/firebase';
+import { useDoc } from '@/firebase/firestore/use-doc';
+import { doc } from 'firebase/firestore';
+import type { Product } from '@/types';
+import { Skeleton } from '@/components/ui/skeleton';
 
-export default function ProductPage({ params }: { params: { id: string } }) {
-  const product = PlaceHolderImages.find((p) => p.id === params.id && p.type === 'product');
 
+export default function ProductPage() {
+  const params = useParams();
+  const id = params.id as string;
+  const firestore = useFirestore();
+  const productRef = firestore && id ? doc(firestore, 'products', id) : null;
+  const { data: product, loading } = useDoc<Product>(productRef);
+
+  if (loading) {
+    return <ProductPageSkeleton />;
+  }
+  
   if (!product) {
     notFound();
   }
@@ -27,7 +42,6 @@ export default function ProductPage({ params }: { params: { id: string } }) {
               alt={product.name!}
               fill
               className="object-cover"
-              data-ai-hint={product.imageHint}
               priority
             />
           </div>
@@ -40,11 +54,9 @@ export default function ProductPage({ params }: { params: { id: string } }) {
             {product.colors && product.colors.length > 0 && (
               <div className="mb-6">
                 <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-3">Color</h3>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
                   {product.colors.map(color => (
-                    <div key={color.name} className="flex items-center gap-2" title={color.name}>
-                      <span className="h-8 w-8 rounded-full border-2" style={{ backgroundColor: color.hex, borderColor: color.hex === '#FFFFFF' ? '#000000' : 'transparent' }} />
-                    </div>
+                     <Badge key={color} variant="outline" className="px-3 py-1 text-sm">{color}</Badge>
                   ))}
                 </div>
               </div>
@@ -68,7 +80,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
             
             <div className="mt-auto pt-6">
               <Button asChild size="lg" className="w-full text-lg py-7">
-                <Link href={`/checkout?productId=${product.id}`}>Buy Now</Link>
+                <Link href={`/checkout?productId=${id}`}>Buy Now</Link>
               </Button>
             </div>
           </div>
@@ -79,9 +91,39 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   );
 }
 
-export async function generateStaticParams() {
-    const products = PlaceHolderImages.filter(p => p.type === 'product');
-    return products.map(product => ({
-        id: product.id,
-    }));
+
+function ProductPageSkeleton() {
+  return (
+    <div className="flex flex-col min-h-screen">
+      <Header />
+      <main className="flex-1 container mx-auto py-8 md:py-16 px-4">
+        <div className="grid md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-start">
+          <Skeleton className="aspect-[3/4] w-full rounded-lg" />
+          <div className="space-y-6">
+            <Skeleton className="h-12 w-3/4" />
+            <Skeleton className="h-10 w-1/4" />
+            <Separator />
+            <div className="space-y-4">
+                <Skeleton className="h-6 w-1/5" />
+                <div className="flex gap-2">
+                    <Skeleton className="h-8 w-16" />
+                    <Skeleton className="h-8 w-16" />
+                </div>
+            </div>
+            <Separator />
+            <div className="space-y-2">
+                <Skeleton className="h-6 w-1/4" />
+                <Skeleton className="h-5 w-full" />
+                <Skeleton className="h-5 w-full" />
+                <Skeleton className="h-5 w-2/3" />
+            </div>
+            <div className="pt-6">
+                <Skeleton className="h-14 w-full" />
+            </div>
+          </div>
+        </div>
+      </main>
+      <Footer />
+    </div>
+  );
 }

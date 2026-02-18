@@ -1,6 +1,6 @@
 "use client";
 
-import { type ImagePlaceholder } from '@/lib/placeholder-images';
+import { type Product } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Trash2 } from 'lucide-react';
@@ -17,8 +17,19 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { Skeleton } from './ui/skeleton';
 
-export function ProductList({ products, onProductDelete }: { products: ImagePlaceholder[], onProductDelete: (productId: string) => void }) {
+export function ProductList({ products, onProductDelete, loading }: { products: Product[], onProductDelete: (productId: string) => void, loading: boolean }) {
+
+  if (loading) {
+    return (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Skeleton className="h-36 w-full" />
+            <Skeleton className="h-36 w-full" />
+            <Skeleton className="h-36 w-full" />
+        </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -53,12 +64,12 @@ export function ProductList({ products, onProductDelete }: { products: ImagePlac
                     <AlertDialogHeader>
                       <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        This action cannot be undone. The product will reappear if you refresh the page.
+                        This action cannot be undone and will permanently delete this product.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => onProductDelete(product.id)}>
+                      <AlertDialogAction onClick={() => onProductDelete(product.id!)}>
                         Continue
                       </AlertDialogAction>
                     </AlertDialogFooter>

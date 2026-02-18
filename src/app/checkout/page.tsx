@@ -1,6 +1,5 @@
 'use client';
-import { useSearchParams } from 'next/navigation';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { formatPrice } from '@/lib/utils';
 import { Header } from '@/components/header';
@@ -9,45 +8,84 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/componen
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useFormStatus } from 'react-dom';
-import { createOrder } from '@/app/actions/order';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
-import { useEffect, useActionState } from 'react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { useFirestore } from '@/firebase';
+import { useDoc } from '@/firebase/firestore/use-doc';
+import { doc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { Skeleton } from '@/components/ui/skeleton';
+import type { Product } from '@/types';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
-const initialState = {
-  message: '',
-  success: false,
-};
-
-function SubmitButton() {
-  const { pending } = useFormStatus();
-  return (
-    <Button type="submit" className="w-full" size="lg" disabled={pending}>
-      {pending ? 'Placing Order...' : 'Confirm Order'}
-    </Button>
-  );
-}
 
 export default function CheckoutPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const productId = searchParams.get('productId');
-  const product = PlaceHolderImages.find((p) => p.id === productId);
+  
+  const firestore = useFirestore();
+  const productRef = firestore && productId ? doc(firestore, 'products', productId) : null;
+  const { data: product, loading: productLoading } = useDoc<Product>(productRef);
 
-  const [state, formAction] = useActionState(createOrder, initialState);
   const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  useEffect(() => {
-    if (state.message && !state.success) {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: state.message,
-      });
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!firestore || !product || !productId) return;
+
+    setLoading(true);
+    setError('');
+
+    const formData = new FormData(event.currentTarget);
+    const firstName = formData.get('firstName') as string;
+    const lastName = formData.get('lastName') as string;
+    const phone = formData.get('phone') as string;
+
+    if (!firstName || !lastName || !phone) {
+        setError('Please fill out all fields.');
+        setLoading(false);
+        return;
     }
-  }, [state, toast]);
+
+    try {
+        const orderCollection = collection(firestore, 'orders');
+        await addDoc(orderCollection, {
+            customerName: `${firstName} ${lastName}`,
+            phone,
+            productId,
+            productName: product.name,
+            productPrice: product.price,
+            productImageUrl: product.imageUrl,
+            status: 'Pending',
+            createdAt: serverTimestamp(),
+        });
+        
+        router.push('/order-confirmation');
+
+    } catch (err) {
+        const permissionError = new FirestorePermissionError({
+            path: 'orders',
+            operation: 'create',
+        });
+        errorEmitter.emit('permission-error', permissionError);
+        setError('Could not place order. Please try again.');
+        toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: 'Could not place your order. Please check permissions and try again.',
+        });
+        setLoading(false);
+    }
+  };
+
+  if (productLoading) {
+      return <CheckoutSkeleton />
+  }
 
   if (!product) {
     return (
@@ -81,14 +119,8 @@ export default function CheckoutPage() {
                     <CardHeader>
                         <CardTitle className="font-headline">Shipping Information</CardTitle>
                     </CardHeader>
-                    <form action={formAction}>
+                    <form onSubmit={handleSubmit}>
                         <CardContent className="space-y-4">
-                             {state.message && !state.success && (
-                                <Alert variant="destructive">
-                                    <AlertDescription>{state.message}</AlertDescription>
-                                </Alert>
-                            )}
-                            <input type="hidden" name="productId" value={product.id} />
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <Label htmlFor="firstName">First Name</Label>
@@ -106,7 +138,9 @@ export default function CheckoutPage() {
                              <p className="text-sm text-muted-foreground pt-4">Payment will be collected upon delivery (Cash on Delivery).</p>
                         </CardContent>
                         <CardFooter>
-                           <SubmitButton />
+                           <Button type="submit" className="w-full" size="lg" disabled={loading}>
+                                {loading ? <><Loader2 className="mr-2 animate-spin" />Placing Order...</> : 'Confirm Order'}
+                            </Button>
                         </CardFooter>
                     </form>
                 </Card>
@@ -128,4 +162,41 @@ export default function CheckoutPage() {
       <Footer />
     </div>
   );
+}
+
+function CheckoutSkeleton() {
+    return (
+        <div className="flex flex-col min-h-screen bg-muted/20">
+            <Header />
+            <main className="flex-1 container mx-auto py-12 px-4">
+                <div className="max-w-4xl mx-auto">
+                    <Skeleton className="h-10 w-1/2 mx-auto mb-8" />
+                    <div className="grid md:grid-cols-2 gap-8 items-start">
+                        <Card>
+                            <CardHeader><Skeleton className="h-8 w-1/3" /></CardHeader>
+                            <CardContent className="space-y-4">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2"><Skeleton className="h-6 w-1/4" /><Skeleton className="h-10 w-full" /></div>
+                                    <div className="space-y-2"><Skeleton className="h-6 w-1/4" /><Skeleton className="h-10 w-full" /></div>
+                                </div>
+                                <div className="space-y-2"><Skeleton className="h-6 w-1/4" /><Skeleton className="h-10 w-full" /></div>
+                            </CardContent>
+                            <CardFooter><Skeleton className="h-12 w-full" /></CardFooter>
+                        </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center gap-4 space-y-0">
+                                <Skeleton className="h-24 w-24 rounded-md" />
+                                <div className="space-y-2">
+                                    <Skeleton className="h-6 w-48" />
+                                    <Skeleton className="h-5 w-16" />
+                                    <Skeleton className="h-7 w-24" />
+                                </div>
+                            </CardHeader>
+                        </Card>
+                    </div>
+                </div>
+            </main>
+            <Footer />
+        </div>
+    );
 }
