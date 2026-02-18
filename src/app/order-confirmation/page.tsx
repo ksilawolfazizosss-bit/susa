@@ -8,7 +8,7 @@ export default function OrderConfirmationPage() {
         <div className="min-h-screen flex items-center justify-center bg-muted/20 p-4">
             <Card className="w-full max-w-lg text-center shadow-2xl">
                 <CardHeader className="items-center">
-                    <CheckCircle className="h-16 w-16 text-green-500 mb-4" />
+                    <CheckCircle className="h-16 w-16 text-success mb-4" />
                     <CardTitle className="font-headline text-3xl">Thank You!</CardTitle>
                     <CardDescription className="text-lg">Your order has been placed successfully.</CardDescription>
                 </CardHeader>
