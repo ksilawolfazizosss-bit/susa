@@ -3,6 +3,7 @@
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { sendOrderEmail } from "@/lib/email";
 
 const orderSchema = z.object({
     firstName: z.string().min(1, "First name is required."),
@@ -44,8 +45,9 @@ export async function createOrder(prevState: any, formData: FormData) {
   console.log("Date:", new Date().toISOString());
   console.log("--- END ORDER ---");
 
-  // In a real app, you would send an email notification here
-  // await sendOrderEmail({ ... });
+  // Send email notification, but don't wait for it to complete
+  // to avoid delaying the user's redirection.
+  sendOrderEmail({ firstName, lastName, phone, product });
 
   redirect("/order-confirmation");
 }
