@@ -9,12 +9,12 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/componen
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useFormStatus } from 'react-dom';
 import { createOrder } from '@/app/actions/order';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useActionState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
 const initialState = {
@@ -36,7 +36,7 @@ export default function CheckoutPage() {
   const productId = searchParams.get('productId');
   const product = PlaceHolderImages.find((p) => p.id === productId);
 
-  const [state, formAction] = useFormState(createOrder, initialState);
+  const [state, formAction] = useActionState(createOrder, initialState);
   const { toast } = useToast();
 
   useEffect(() => {
