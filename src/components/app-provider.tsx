@@ -1,29 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { SplashScreen } from "./splash-screen";
-
+// The splash screen logic has been removed to make the application load instantly.
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (sessionStorage.getItem("splashShown")) {
-      setLoading(false);
-    }
-  }, []);
-
-  const handleSplashFinish = () => {
-    sessionStorage.setItem("splashShown", "true");
-    setLoading(false);
-  };
-
-  return (
-    <>
-      {loading ? (
-        <SplashScreen onFinished={handleSplashFinish} />
-      ) : (
-        children
-      )}
-    </>
-  );
+  return <>{children}</>;
 }
