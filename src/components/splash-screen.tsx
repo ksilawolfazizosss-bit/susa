@@ -10,11 +10,11 @@ export function SplashScreen({ onFinished }: { onFinished: () => void }) {
     setIsMounted(true);
     const exitTimer = setTimeout(() => {
       setIsExiting(true);
-    }, 2500);
+    }, 500); // Reduced for faster load
 
     const finishTimer = setTimeout(() => {
       onFinished();
-    }, 3500);
+    }, 1000); // Reduced for faster load
 
     return () => {
       clearTimeout(exitTimer);
@@ -24,13 +24,13 @@ export function SplashScreen({ onFinished }: { onFinished: () => void }) {
 
   const handleClick = () => {
     setIsExiting(true);
-    setTimeout(onFinished, 1000);
+    setTimeout(onFinished, 500);
   };
 
   return (
     <div
       onClick={handleClick}
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-background transition-opacity duration-1000 cursor-pointer ${isExiting ? 'opacity-0' : 'opacity-100'}`}
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-background transition-opacity duration-500 cursor-pointer ${isExiting ? 'opacity-0' : 'opacity-100'}`}
       aria-hidden="true"
     >
       <h1
