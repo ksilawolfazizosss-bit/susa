@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { Button } from './ui/button';
 import {
   Dialog,
@@ -48,16 +47,12 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-primary/20 bg-background/80 backdrop-blur-sm">
-      <div className="container mx-auto flex h-20 items-center justify-between px-4">
-        <Link href="/">
-          <h1 className="font-headline text-4xl text-foreground hover:text-primary transition-colors duration-300">
-            Susan Fashion
-          </h1>
-        </Link>
-
+      <div className="container mx-auto flex h-20 items-center justify-center px-4">
         <Dialog open={open} onOpenChange={onDialogClose}>
           <DialogTrigger asChild>
-            <Button variant="ghost">Admin</Button>
+            <h1 className="font-headline text-4xl text-foreground hover:text-primary transition-colors duration-300 cursor-pointer">
+              Susan Fashion
+            </h1>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
