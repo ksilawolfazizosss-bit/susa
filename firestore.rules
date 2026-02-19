@@ -1,0 +1,20 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Products: Allow public read, and allow all writes.
+    // In a production app, write access should be restricted to authenticated admins.
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Orders: Allow anyone to create an order, and allow anyone to view orders
+    // in the admin panel. In a production app, read/update/delete access should be
+    // restricted to authenticated admins.
+    match /orders/{orderId} {
+      allow create: if true;
+      allow read, update, delete: if true;
+    }
+  }
+}

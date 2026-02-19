@@ -34,7 +34,7 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!firestore || !product || !productId) return;
 
@@ -51,36 +51,38 @@ export default function CheckoutPage() {
         setLoading(false);
         return;
     }
+    
+    const orderCollection = collection(firestore, 'orders');
+    const orderData = {
+        customerName: `${firstName} ${lastName}`,
+        phone,
+        productId,
+        productName: product.name,
+        productPrice: product.price,
+        productImageUrl: product.imageUrl,
+        status: 'Pending' as const,
+        createdAt: serverTimestamp(),
+    };
 
-    try {
-        const orderCollection = collection(firestore, 'orders');
-        await addDoc(orderCollection, {
-            customerName: `${firstName} ${lastName}`,
-            phone,
-            productId,
-            productName: product.name,
-            productPrice: product.price,
-            productImageUrl: product.imageUrl,
-            status: 'Pending',
-            createdAt: serverTimestamp(),
+    addDoc(orderCollection, orderData)
+        .then(() => {
+            router.push('/order-confirmation');
+        })
+        .catch((err) => {
+            const permissionError = new FirestorePermissionError({
+                path: 'orders',
+                operation: 'create',
+                requestResourceData: orderData,
+            });
+            errorEmitter.emit('permission-error', permissionError);
+            setError('Could not place order. Please try again.');
+            toast({
+                variant: 'destructive',
+                title: 'Error',
+                description: 'Could not place your order. Please check permissions and try again.',
+            });
+            setLoading(false);
         });
-        
-        router.push('/order-confirmation');
-
-    } catch (err) {
-        const permissionError = new FirestorePermissionError({
-            path: 'orders',
-            operation: 'create',
-        });
-        errorEmitter.emit('permission-error', permissionError);
-        setError('Could not place order. Please try again.');
-        toast({
-            variant: 'destructive',
-            title: 'Error',
-            description: 'Could not place your order. Please check permissions and try again.',
-        });
-        setLoading(false);
-    }
   };
 
   if (productLoading) {

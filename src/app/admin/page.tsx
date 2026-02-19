@@ -28,61 +28,65 @@ export default function AdminPage() {
 
   const { toast } = useToast();
 
-  const handleAddProduct = async (newProductData: ProductFormValues) => {
+  const handleAddProduct = (newProductData: ProductFormValues) => {
     if (!firestore) return;
 
-    try {
-      const productCollection = collection(firestore, "products");
-      const docRef = await addDoc(productCollection, {
-        name: newProductData.name,
-        price: newProductData.price,
-        category: newProductData.category,
-        description: newProductData.description,
-        imageUrl: newProductData.image,
-        sizes: newProductData.sizes?.split(',').map(s => s.trim()).filter(Boolean) || [],
-        colors: newProductData.colors?.split(',').map(c => c.trim()).filter(Boolean) || [],
-        keyFeatures: newProductData.keyFeatures?.split(',').map(s => s.trim()).filter(Boolean) || [],
-      });
+    const productCollection = collection(firestore, "products");
+    const productData = {
+      name: newProductData.name,
+      price: newProductData.price,
+      category: newProductData.category,
+      description: newProductData.description,
+      imageUrl: newProductData.image,
+      sizes: newProductData.sizes?.split(',').map(s => s.trim()).filter(Boolean) || [],
+      colors: newProductData.colors?.split(',').map(c => c.trim()).filter(Boolean) || [],
+      keyFeatures: newProductData.keyFeatures?.split(',').map(s => s.trim()).filter(Boolean) || [],
+    };
 
-      toast({
-        title: "Product Published!",
-        description: "Your new product is now live in the store.",
+    addDoc(productCollection, productData)
+      .then(() => {
+        toast({
+          title: "Product Published!",
+          description: "Your new product is now live in the store.",
+        });
+      })
+      .catch((err) => {
+        const permissionError = new FirestorePermissionError({
+            path: 'products',
+            operation: 'create',
+            requestResourceData: productData,
+        });
+        errorEmitter.emit('permission-error', permissionError);
+        toast({
+          variant: "destructive",
+          title: "Uh oh! Something went wrong.",
+          description: "Could not add product. Check permissions.",
+        });
       });
-    } catch (err) {
-      const permissionError = new FirestorePermissionError({
-          path: 'products',
-          operation: 'create',
-      });
-      errorEmitter.emit('permission-error', permissionError);
-      toast({
-        variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: "Could not add product. Check permissions.",
-      });
-    }
   };
 
-  const handleDeleteProduct = async (productId: string) => {
+  const handleDeleteProduct = (productId: string) => {
     if (!firestore) return;
 
-    try {
-      await deleteDoc(doc(firestore, "products", productId));
-      toast({
-        title: 'Product Deleted',
-        description: `The product has been removed from the store.`,
+    deleteDoc(doc(firestore, "products", productId))
+      .then(() => {
+        toast({
+          title: 'Product Deleted',
+          description: `The product has been removed from the store.`,
+        });
+      })
+      .catch((err) => {
+        const permissionError = new FirestorePermissionError({
+            path: `products/${productId}`,
+            operation: 'delete',
+        });
+        errorEmitter.emit('permission-error', permissionError);
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: 'Could not delete the product. Check permissions.',
+        });
       });
-    } catch (err) {
-      const permissionError = new FirestorePermissionError({
-          path: `products/${productId}`,
-          operation: 'delete',
-      });
-      errorEmitter.emit('permission-error', permissionError);
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Could not delete the product. Check permissions.',
-      });
-    }
   };
 
 
