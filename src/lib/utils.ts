@@ -6,9 +6,9 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatPrice(price?: number) {
-  if (!price && price !== 0) return "$0.00";
-  return new Intl.NumberFormat("en-US", {
+  if (!price && price !== 0) return "0.000 TND";
+  return new Intl.NumberFormat("ar-TN", {
     style: "currency",
-    currency: "USD",
+    currency: "TND",
   }).format(price);
 }
