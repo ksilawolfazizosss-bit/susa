@@ -17,7 +17,7 @@ export default {
     },
     extend: {
       backgroundImage: {
-        'hero-pattern': "url('https://images.unsplash.com/photo-1605379444994-d3781b0c4b69?q=80&w=2070&auto=format&fit=crop')",
+        'hero-pattern': "url('https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1974&auto=format&fit=crop')",
       },
       fontFamily: {
         body: ['Cormorant Garamond', 'serif'],
