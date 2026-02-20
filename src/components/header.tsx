@@ -15,7 +15,6 @@ import { Input } from './ui/input';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import Link from 'next/link';
 
 export function Header() {
   const [password, setPassword] = useState('');
@@ -46,14 +45,16 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-sm">
+    <header className="sticky top-0 z-40 w-full border-b border-primary/20 bg-background/95 backdrop-blur-sm">
       <div className="container mx-auto flex h-20 items-center justify-center px-4">
         <Dialog open={open} onOpenChange={onDialogClose}>
           <DialogTrigger asChild>
-            <span className="flex items-center gap-3 text-foreground hover:text-primary transition-colors duration-300 cursor-pointer">
-              <h1 className="font-headline text-4xl">
+            <span className="group flex cursor-pointer items-center gap-6 text-foreground transition-colors duration-300 hover:text-primary">
+              <div className="h-px w-24 bg-gradient-to-l from-primary/50 to-transparent transition-all duration-300 group-hover:w-32 group-hover:from-primary/80" />
+              <h1 className="font-headline text-3xl uppercase tracking-widest md:text-4xl">
                 Susan Fashion
               </h1>
+              <div className="h-px w-24 bg-gradient-to-r from-primary/50 to-transparent transition-all duration-300 group-hover:w-32 group-hover:from-primary/80" />
             </span>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
