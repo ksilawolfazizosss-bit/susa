@@ -15,8 +15,40 @@ import { Input } from './ui/input';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import { Gem } from 'lucide-react';
 import Link from 'next/link';
+
+const Logo = ({ className }: { className?: string }) => (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
+      <path
+        d="M12 1.66699L5.33333 6.00033L12 10.3337L18.6667 6.00033L12 1.66699Z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M5.33333 18.0003L12 22.3337L18.6667 18.0003"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M5.33333 12.0003L12 16.3337L18.6667 12.0003"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
 
 export function Header() {
   const [password, setPassword] = useState('');
@@ -51,8 +83,8 @@ export function Header() {
       <div className="container mx-auto flex h-20 items-center justify-center px-4">
         <Dialog open={open} onOpenChange={onDialogClose}>
           <DialogTrigger asChild>
-            <Link href="/" className="flex items-center gap-2 text-foreground hover:text-primary transition-colors duration-300 cursor-pointer">
-              <Gem className="h-8 w-8 text-primary" />
+            <Link href="/" className="flex items-center gap-3 text-foreground hover:text-primary transition-colors duration-300 cursor-pointer">
+              <Logo className="h-7 w-7 text-primary" />
               <h1 className="font-headline text-4xl">
                 Susan Fashion
               </h1>

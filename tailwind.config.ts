@@ -17,7 +17,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        body: ['Alegreya', 'serif'],
+        body: ['Cormorant Garamond', 'serif'],
         headline: ['Belleza', 'sans-serif'],
       },
       colors: {
