@@ -13,7 +13,7 @@ export default function Home() {
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-1">
-        <section className="relative flex items-center justify-center text-center bg-hero-pattern bg-cover bg-center py-24 md:py-32">
+        <section className="relative flex items-center justify-center text-center bg-hero-pattern bg-cover bg-center min-h-screen">
             <div className="absolute inset-0 bg-background/70 backdrop-blur-sm" />
             <div className="relative z-10 p-4">
                 <h1 className="font-headline text-5xl md:text-7xl tracking-tight drop-shadow-md text-primary">
