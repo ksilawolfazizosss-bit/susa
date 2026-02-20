@@ -16,6 +16,9 @@ export default {
       },
     },
     extend: {
+      backgroundImage: {
+        'hero-pattern': "url('https://images.unsplash.com/photo-1605379444994-d3781b0c4b69?q=80&w=2070&auto=format&fit=crop')",
+      },
       fontFamily: {
         body: ['Cormorant Garamond', 'serif'],
         headline: ['Belleza', 'sans-serif'],
