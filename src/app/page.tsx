@@ -17,12 +17,12 @@ export default function Home() {
       <main className="flex-1">
         <section className="relative h-[60vh] md:h-[70vh] flex items-center justify-center text-center text-foreground bg-secondary/30">
             <Image 
-                src="https://picsum.photos/seed/fashion-gold/1920/1080"
-                alt="Stylish fashion collection"
+                src="https://picsum.photos/seed/purple-sparkle/1920/1080"
+                alt="Abstract purple and gold sparkles"
                 fill
                 className="object-cover"
                 priority
-                data-ai-hint="luxury fashion store"
+                data-ai-hint="abstract purple gold sparkles"
             />
              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
             <div className="relative z-10 p-4">
