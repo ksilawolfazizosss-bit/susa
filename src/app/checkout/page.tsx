@@ -72,7 +72,6 @@ export default function CheckoutPage() {
             router.push('/order-confirmation');
         })
         .catch((err) => {
-            console.error("Firebase Create Order Error:", err);
             const permissionError = new FirestorePermissionError({
                 path: 'orders',
                 operation: 'create',

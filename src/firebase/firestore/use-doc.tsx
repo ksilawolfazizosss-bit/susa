@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { onSnapshot, DocumentReference } from 'firebase/firestore';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
@@ -9,8 +9,10 @@ export function useDoc<T>(docRef: DocumentReference | null) {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const memoizedDocRef = useMemo(() => docRef, [docRef?.path]);
+
   useEffect(() => {
-    if (!docRef) {
+    if (!memoizedDocRef) {
       setData(null);
       setLoading(false);
       return () => {};
@@ -18,7 +20,7 @@ export function useDoc<T>(docRef: DocumentReference | null) {
 
     setLoading(true);
     const unsubscribe = onSnapshot(
-      docRef,
+      memoizedDocRef,
       (snapshot) => {
         if (snapshot.exists()) {
           setData({ id: snapshot.id, ...snapshot.data() } as T);
@@ -28,9 +30,8 @@ export function useDoc<T>(docRef: DocumentReference | null) {
         setLoading(false);
       },
       (err) => {
-        console.error('Snapshot error:', err);
         const permissionError = new FirestorePermissionError({
-          path: docRef.path,
+          path: memoizedDocRef.path,
           operation: 'get',
         });
         errorEmitter.emit('permission-error', permissionError);
@@ -40,7 +41,7 @@ export function useDoc<T>(docRef: DocumentReference | null) {
     );
 
     return () => unsubscribe();
-  }, [docRef]);
+  }, [memoizedDocRef]);
 
   return { data, loading };
 }

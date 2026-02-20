@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { ProductForm, type ProductFormValues } from "@/components/product-form";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -59,7 +59,6 @@ export default function AdminPage() {
         });
       })
       .catch((err) => {
-        console.error("Firebase Add Product Error:", err);
         const permissionError = new FirestorePermissionError({
             path: 'products',
             operation: 'create',
@@ -85,7 +84,6 @@ export default function AdminPage() {
         });
       })
       .catch((err) => {
-        console.error("Firebase Delete Product Error:", err);
         const permissionError = new FirestorePermissionError({
             path: `products/${productId}`,
             operation: 'delete',
