@@ -15,24 +15,33 @@ export default function Home() {
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-1">
-        <section className="relative h-[50vh] md:h-[60vh] flex items-center justify-center text-center text-white bg-secondary">
+        <section className="relative h-[60vh] md:h-[70vh] flex items-center justify-center text-center text-foreground bg-secondary/30">
             <Image 
-                src="https://picsum.photos/seed/fashion-hero/1920/1080"
+                src="https://picsum.photos/seed/fashion-gold/1920/1080"
                 alt="Stylish fashion collection"
                 fill
                 className="object-cover"
                 priority
-                data-ai-hint="fashion model"
+                data-ai-hint="luxury fashion store"
             />
-             <div className="absolute inset-0 bg-black/50" />
+             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
             <div className="relative z-10 p-4">
-                <h1 className="font-headline text-5xl md:text-7xl tracking-tight drop-shadow-md">
+                <h1 className="font-headline text-5xl md:text-7xl tracking-tight drop-shadow-md text-primary">
                     Elegance Redefined
                 </h1>
-                <p className="mt-4 text-lg md:text-xl max-w-2xl mx-auto drop-shadow-sm">
+                <p className="mt-4 text-lg md:text-xl max-w-2xl mx-auto drop-shadow-sm text-foreground/80">
                     Discover pieces of unparalleled craftsmanship and timeless style.
                 </p>
             </div>
+        </section>
+
+        <section className="bg-secondary/30 py-12 md:py-20">
+          <div className="container mx-auto text-center max-w-3xl">
+            <h3 className="font-headline text-3xl text-primary">Our Philosophy</h3>
+            <p className="mt-4 text-lg text-foreground/80">
+              At Susan Fashion, we believe in the power of timeless elegance. Each piece in our collection is a testament to meticulous craftsmanship, premium materials, and a design philosophy that transcends fleeting trends. We are dedicated to providing you with fashion that is not just worn, but experienced.
+            </p>
+          </div>
         </section>
 
         <section className="container mx-auto px-4 py-12 md:py-20">

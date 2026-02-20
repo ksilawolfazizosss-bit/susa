@@ -16,6 +16,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { Gem } from 'lucide-react';
+import Link from 'next/link';
 
 export function Header() {
   const [password, setPassword] = useState('');
@@ -50,12 +51,12 @@ export function Header() {
       <div className="container mx-auto flex h-20 items-center justify-center px-4">
         <Dialog open={open} onOpenChange={onDialogClose}>
           <DialogTrigger asChild>
-            <div className="flex items-center gap-2 text-foreground hover:text-primary transition-colors duration-300 cursor-pointer">
-              <Gem className="h-8 w-8" />
+            <Link href="/" className="flex items-center gap-2 text-foreground hover:text-primary transition-colors duration-300 cursor-pointer">
+              <Gem className="h-8 w-8 text-primary" />
               <h1 className="font-headline text-4xl">
                 Susan Fashion
               </h1>
-            </div>
+            </Link>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>

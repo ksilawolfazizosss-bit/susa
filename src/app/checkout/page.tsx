@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { ArrowLeft, Loader2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useFirestore } from '@/firebase';
 import { useDoc } from '@/firebase/firestore/use-doc';
@@ -27,7 +27,10 @@ export default function CheckoutPage() {
   const productId = searchParams.get('productId');
   
   const firestore = useFirestore();
-  const productRef = firestore && productId ? doc(firestore, 'products', productId) : null;
+  const productRef = useMemo(() =>
+    firestore && productId ? doc(firestore, 'products', productId) : null,
+    [firestore, productId]
+  );
   const { data: product, loading: productLoading } = useDoc<Product>(productRef);
 
   const { toast } = useToast();

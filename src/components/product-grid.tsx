@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { useFirestore } from '@/firebase';
 import { useCollection } from '@/firebase/firestore/use-collection';
 import { collection } from 'firebase/firestore';
@@ -12,7 +13,10 @@ import { Button } from './ui/button';
 
 export function ProductGrid() {
     const firestore = useFirestore();
-    const productCollection = firestore ? collection(firestore, 'products') : null;
+    const productCollection = useMemo(() => 
+        firestore ? collection(firestore, 'products') : null,
+        [firestore]
+    );
     const { data: products, loading } = useCollection<Product>(productCollection);
 
     if (loading) {

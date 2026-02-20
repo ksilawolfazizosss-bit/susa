@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ProductForm, type ProductFormValues } from "@/components/product-form";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -19,12 +19,20 @@ import { FirestorePermissionError } from "@/firebase/errors";
 
 export default function AdminPage() {
   const firestore = useFirestore();
-  const { data: products, loading: productsLoading } = useCollection<Product>(
-    firestore ? collection(firestore, "products") : null
+
+  const productsQuery = useMemo(
+    () => (firestore ? collection(firestore, 'products') : null),
+    [firestore]
   );
-  const { data: orders, loading: ordersLoading } = useCollection<Order>(
-    firestore ? collection(firestore, "orders") : null
+  const { data: products, loading: productsLoading } =
+    useCollection<Product>(productsQuery);
+
+  const ordersQuery = useMemo(
+    () => (firestore ? collection(firestore, 'orders') : null),
+    [firestore]
   );
+  const { data: orders, loading: ordersLoading } =
+    useCollection<Order>(ordersQuery);
 
   const { toast } = useToast();
 

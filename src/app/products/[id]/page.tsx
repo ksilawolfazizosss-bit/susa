@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { notFound, useParams } from 'next/navigation';
 import Image from 'next/image';
 import { Header } from '@/components/header';
@@ -20,7 +21,10 @@ export default function ProductPage() {
   const params = useParams();
   const id = params.id as string;
   const firestore = useFirestore();
-  const productRef = firestore && id ? doc(firestore, 'products', id) : null;
+  const productRef = useMemo(() =>
+    (firestore && id ? doc(firestore, 'products', id) : null),
+    [firestore, id]
+  );
   const { data: product, loading } = useDoc<Product>(productRef);
 
   if (loading) {

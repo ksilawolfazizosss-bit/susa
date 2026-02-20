@@ -1,32 +1,24 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
-import { onSnapshot, Query, DocumentData, collection, getDocs } from 'firebase/firestore';
+import { useEffect, useState } from 'react';
+import { onSnapshot, Query } from 'firebase/firestore';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 
 export function useCollection<T>(query: Query | null) {
   const [data, setData] = useState<T[] | null>(null);
   const [loading, setLoading] = useState(true);
-  const queryRef = useRef(query);
 
   useEffect(() => {
-    if (query?.path !== queryRef.current?.path) {
-      queryRef.current = query;
-    }
-  }, [query]);
-
-  useEffect(() => {
-    if (!queryRef.current) {
-      setData([]);
+    if (!query) {
+      setData(null);
       setLoading(false);
-      return;
+      return () => {}; // Return an empty cleanup function
     }
 
     setLoading(true);
-
     const unsubscribe = onSnapshot(
-      queryRef.current,
+      query,
       (snapshot) => {
         const data: T[] = snapshot.docs.map((doc) => ({
           id: doc.id,
@@ -35,19 +27,21 @@ export function useCollection<T>(query: Query | null) {
         setData(data);
         setLoading(false);
       },
-      async (err) => {
-        console.error("Snapshot error:", err);
+      (err) => {
+        console.error('Snapshot error:', err);
         const permissionError = new FirestorePermissionError({
-          path: queryRef.current!.path,
+          path: query.path,
           operation: 'list',
         });
         errorEmitter.emit('permission-error', permissionError);
+        setData(null); // Set data to null on error
         setLoading(false);
       }
     );
 
+    // Unsubscribe from the listener when the component unmounts or query changes
     return () => unsubscribe();
-  }, [queryRef.current]);
+  }, [query]); // Re-run effect if query object changes
 
   return { data, loading };
 }
