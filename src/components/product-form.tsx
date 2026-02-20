@@ -16,8 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import Image from "next/image";
-import { ImagePlus, Sparkles, Loader2 } from "lucide-react";
+import { Sparkles, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { generateProductDescription } from "@/ai/flows/product-description-generator-flow";
@@ -36,8 +35,6 @@ const formSchema = z.object({
 export type ProductFormValues = z.infer<typeof formSchema>;
 
 export function ProductForm({ onProductAdd }: { onProductAdd: (data: ProductFormValues) => void }) {
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [isImageLoading, setIsImageLoading] = useState(false);
   const [isDescriptionLoading, setIsDescriptionLoading] = useState(false);
   const { toast } = useToast();
 
@@ -54,34 +51,6 @@ export function ProductForm({ onProductAdd }: { onProductAdd: (data: ProductForm
       image: "",
     },
   });
-
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    setIsImageLoading(true);
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => {
-      const dataUri = reader.result as string;
-      form.setValue("image", dataUri, { shouldValidate: true });
-      setImagePreview(dataUri);
-      toast({
-        title: "Image Uploaded",
-        description: "Your product image has been loaded.",
-      });
-      setIsImageLoading(false);
-    };
-    reader.onerror = (error) => {
-      console.error("File reading error:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Could not read the image file.",
-      });
-      setIsImageLoading(false);
-    };
-  };
 
   const handleGenerateDescription = async () => {
     const { name, category, keyFeatures } = form.getValues();
@@ -114,7 +83,6 @@ export function ProductForm({ onProductAdd }: { onProductAdd: (data: ProductForm
   function onSubmit(values: ProductFormValues) {
     onProductAdd(values);
     form.reset();
-    setImagePreview(null);
   }
 
   return (
@@ -122,43 +90,8 @@ export function ProductForm({ onProductAdd }: { onProductAdd: (data: ProductForm
       <CardContent className="p-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="md:col-span-1 space-y-2">
-                 <FormLabel>Product Image</FormLabel>
-                <FormField
-                  control={form.control}
-                  name="image"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <div>
-                          <label htmlFor="image-upload" className="cursor-pointer">
-                            <Card
-                              className={`aspect-square w-full flex items-center justify-center flex-col gap-2 ${
-                                imagePreview ? '' : 'border-dashed'
-                              }`}
-                            >
-                              {isImageLoading ? (
-                                <Loader2 className="h-8 w-8 animate-spin" />
-                              ) : imagePreview ? (
-                                <Image src={imagePreview} alt="Product preview" width={300} height={300} className="object-cover h-full w-full rounded-md" />
-                              ) : (
-                                <>
-                                  <ImagePlus className="h-8 w-8 text-muted-foreground" />
-                                  <span className="text-muted-foreground text-sm">Upload Image</span>
-                                </>
-                              )}
-                            </Card>
-                          </label>
-                          <Input id="image-upload" type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <div className="md:col-span-2 space-y-4">
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="space-y-6">
                 <FormField
                   control={form.control}
                   name="name"
@@ -194,41 +127,60 @@ export function ProductForm({ onProductAdd }: { onProductAdd: (data: ProductForm
                     )}
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                 <div className="grid grid-cols-2 gap-4">
                     <FormField control={form.control} name="sizes" render={({ field }) => (
                         <FormItem>
                             <FormLabel>Sizes</FormLabel>
                             <FormControl><Input placeholder="S, M, L, XL" {...field} /></FormControl>
-                            <FormDescription>Comma-separated values.</FormDescription>
+                            <FormDescription>Comma-separated.</FormDescription>
+                             <FormMessage />
                         </FormItem>
                     )} />
                     <FormField control={form.control} name="colors" render={({ field }) => (
                         <FormItem>
                             <FormLabel>Colors</FormLabel>
                             <FormControl><Input placeholder="Black, Burgundy" {...field} /></FormControl>
-                             <FormDescription>Comma-separated values.</FormDescription>
+                             <FormDescription>Comma-separated.</FormDescription>
+                             <FormMessage />
                         </FormItem>
                     )} />
                 </div>
               </div>
+              <div className="space-y-6">
+                 <FormField
+                  control={form.control}
+                  name="image"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Image URL</FormLabel>
+                      <FormControl>
+                        <Input placeholder="https://example.com/image.png" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        Paste a public URL for the product image. Use <a href="https://picsum.photos/" target="_blank" rel="noopener noreferrer" className="underline text-primary">picsum.photos</a> for placeholders.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                  control={form.control}
+                  name="keyFeatures"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Key Features</FormLabel>
+                      <FormControl>
+                        <Textarea placeholder="e.g., Italian silk, hand-stitched embroidery, flowing silhouette" {...field} rows={5} />
+                      </FormControl>
+                      <FormDescription>
+                        Comma-separated list for the AI generator.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
-
-            <FormField
-              control={form.control}
-              name="keyFeatures"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Key Features</FormLabel>
-                  <FormControl>
-                    <Textarea placeholder="e.g., Italian silk, hand-stitched embroidery, flowing silhouette" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    Provide a comma-separated list of key features. This will be used by the AI to generate a description.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
             <FormField
               control={form.control}
