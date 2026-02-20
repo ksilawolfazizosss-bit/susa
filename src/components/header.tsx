@@ -17,25 +17,6 @@ import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
 
-const Logo = ({ className }: { className?: string }) => (
-    <svg
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
-    >
-      <path
-        d="M17.5 6C17.5 8.20914 15.7091 10 13.5 10H10.5C8.29086 10 6.5 11.7909 6.5 14C6.5 16.2091 8.29086 18 10.5 18H13.5C15.7091 18 17.5 19.7909 17.5 22"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-
 export function Header() {
   const [password, setPassword] = useState('');
   const [open, setOpen] = useState(false);
@@ -69,12 +50,11 @@ export function Header() {
       <div className="container mx-auto flex h-20 items-center justify-center px-4">
         <Dialog open={open} onOpenChange={onDialogClose}>
           <DialogTrigger asChild>
-            <Link href="/" className="flex items-center gap-3 text-foreground hover:text-primary transition-colors duration-300 cursor-pointer">
-              <Logo className="h-7 w-7 text-primary" />
+            <span className="flex items-center gap-3 text-foreground hover:text-primary transition-colors duration-300 cursor-pointer">
               <h1 className="font-headline text-4xl">
                 Susan Fashion
               </h1>
-            </Link>
+            </span>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>

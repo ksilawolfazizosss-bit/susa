@@ -36,6 +36,12 @@ export default function RootLayout({
           <AppProvider>{children}</AppProvider>
           <Toaster />
         </FirebaseClientProvider>
+        <audio
+          src="https://cdn.pixabay.com/download/audio/2022/10/19/audio_b88b3941a2.mp3"
+          autoPlay
+          loop
+          className="sr-only"
+        />
       </body>
     </html>
   );

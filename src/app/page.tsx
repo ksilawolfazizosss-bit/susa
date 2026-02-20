@@ -14,7 +14,12 @@ export default function Home() {
       <Header />
       <main className="flex-1">
         <section className="relative flex items-center justify-center text-center bg-hero-pattern bg-cover bg-center min-h-screen">
-            <div className="absolute inset-0 bg-background/70 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-background/70 backdrop-blur-sm" />
+          <div className="relative z-10 animate-in fade-in zoom-in-95 duration-1000">
+            <h1 className="font-headline text-7xl md:text-9xl text-primary drop-shadow-lg">
+              Susan Fashion
+            </h1>
+          </div>
         </section>
 
         <section className="container mx-auto px-4 py-12 md:py-20">
