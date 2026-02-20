@@ -27,21 +27,7 @@ const Logo = ({ className }: { className?: string }) => (
       className={className}
     >
       <path
-        d="M12 1.66699L5.33333 6.00033L12 10.3337L18.6667 6.00033L12 1.66699Z"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M5.33333 18.0003L12 22.3337L18.6667 18.0003"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M5.33333 12.0003L12 16.3337L18.6667 12.0003"
+        d="M17.5 6C17.5 8.20914 15.7091 10 13.5 10H10.5C8.29086 10 6.5 11.7909 6.5 14C6.5 16.2091 8.29086 18 10.5 18H13.5C15.7091 18 17.5 19.7909 17.5 22"
         stroke="currentColor"
         strokeWidth="1.5"
         strokeLinecap="round"
