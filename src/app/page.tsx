@@ -7,25 +7,14 @@ import { Footer } from '@/components/footer';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ProductGrid } from '@/components/product-grid';
-import Image from 'next/image';
-
 
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-1">
-        <section className="relative h-[60vh] md:h-[70vh] flex items-center justify-center text-center text-foreground bg-secondary/30">
-            <Image 
-                src="https://picsum.photos/seed/purple-sparkle/1920/1080"
-                alt="Abstract purple and gold sparkles"
-                fill
-                className="object-cover"
-                priority
-                data-ai-hint="abstract purple gold sparkles"
-            />
-             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
-            <div className="relative z-10 p-4">
+        <section className="flex items-center justify-center text-center bg-background py-24 md:py-32">
+            <div className="p-4">
                 <h1 className="font-headline text-5xl md:text-7xl tracking-tight drop-shadow-md text-primary">
                     Elegance Redefined
                 </h1>
