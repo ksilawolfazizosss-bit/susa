@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { ProductForm, type ProductFormValues } from "@/components/product-form";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,7 @@ import { useFirestore } from "@/firebase";
 import type { Product, Order } from "@/types";
 import { errorEmitter } from "@/firebase/error-emitter";
 import { FirestorePermissionError } from "@/firebase/errors";
+import { optimizeProductImage } from "@/ai/flows/product-image-optimizer-flow";
 
 export default function AdminPage() {
   const firestore = useFirestore();
@@ -36,27 +37,51 @@ export default function AdminPage() {
 
   const { toast } = useToast();
 
-  const handleAddProduct = (newProductData: ProductFormValues, imageData: string) => {
-    if (!firestore) return;
+  const handleAddProduct = async (newProductData: ProductFormValues, imageData: string) => {
+    if (!firestore) {
+      toast({
+        variant: "destructive",
+        title: "Database not connected",
+        description: "Please try again later.",
+      });
+      throw new Error("Firestore not available");
+    }
 
+    let optimizedImageData = imageData;
+    try {
+        toast({ title: "Optimizing Image...", description: "Please wait while we enhance your product photo."});
+        const optimizationResult = await optimizeProductImage({ photoDataUri: imageData });
+        optimizedImageData = optimizationResult.optimizedPhotoDataUri;
+        toast({
+            title: "Image Optimized!",
+            description: "Your product image has been prepared for the store.",
+        });
+    } catch (error) {
+        console.error("Image optimization failed:", error);
+        toast({
+            variant: "destructive",
+            title: "Image Optimization Failed",
+            description: "Saving the original image instead. This might fail if the image is too large.",
+        });
+    }
+    
     const productCollection = collection(firestore, "products");
     
     const productData = {
       name: newProductData.name,
       price: newProductData.price,
-      imageUrl: imageData,
+      imageUrl: optimizedImageData,
       sizes: newProductData.sizes.split(',').map(s => s.trim()).filter(Boolean),
       colors: newProductData.colors.split(',').map(c => c.trim()).filter(Boolean),
     };
 
-    addDoc(productCollection, productData)
-      .then(() => {
+    try {
+        await addDoc(productCollection, productData);
         toast({
-          title: "Product Published!",
-          description: "Your new product is now live in the store.",
+            title: "Product Published!",
+            description: "Your new product is now live in the store.",
         });
-      })
-      .catch((err) => {
+    } catch (err) {
         console.error("Error adding document: ", err);
         const permissionError = new FirestorePermissionError({
             path: 'products',
@@ -67,9 +92,10 @@ export default function AdminPage() {
         toast({
           variant: "destructive",
           title: "Failed to Save Product",
-          description: "There was an error saving the product. This could be due to an image that is too large or a database permissions issue.",
+          description: "There was an error saving the product. This could be due to a large image or database permissions issue.",
         });
-      });
+        throw err;
+    }
   };
 
   const handleDeleteProduct = (productId: string) => {

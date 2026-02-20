@@ -18,7 +18,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
-import { UploadCloud } from "lucide-react";
+import { Loader2, UploadCloud } from "lucide-react";
 
 const formSchema = z.object({
   name: z.string().min(2, "Product name must be at least 2 characters."),
@@ -29,9 +29,10 @@ const formSchema = z.object({
 
 export type ProductFormValues = z.infer<typeof formSchema>;
 
-export function ProductForm({ onProductAdd }: { onProductAdd: (data: ProductFormValues, imageData: string) => void }) {
+export function ProductForm({ onProductAdd }: { onProductAdd: (data: ProductFormValues, imageData: string) => Promise<void> }) {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageData, setImageData] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<ProductFormValues>({
@@ -65,7 +66,7 @@ export function ProductForm({ onProductAdd }: { onProductAdd: (data: ProductForm
     }
   };
 
-  function onSubmit(values: ProductFormValues) {
+  async function onSubmit(values: ProductFormValues) {
     if (!imageData) {
         toast({
             variant: "destructive",
@@ -74,10 +75,18 @@ export function ProductForm({ onProductAdd }: { onProductAdd: (data: ProductForm
         });
         return;
     }
-    onProductAdd(values, imageData);
-    form.reset();
-    setImagePreview(null);
-    setImageData(null);
+
+    setIsSubmitting(true);
+    try {
+      await onProductAdd(values, imageData);
+      form.reset();
+      setImagePreview(null);
+      setImageData(null);
+    } catch (error) {
+        // Errors are handled and toasted by the parent `onProductAdd` function.
+    } finally {
+        setIsSubmitting(false);
+    }
   }
 
   return (
@@ -152,7 +161,16 @@ export function ProductForm({ onProductAdd }: { onProductAdd: (data: ProductForm
             </div>
 
             <div className="flex justify-end">
-              <Button type="submit" size="lg">Publish Product</Button>
+              <Button type="submit" size="lg" disabled={isSubmitting}>
+                {isSubmitting ? (
+                    <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Publishing...
+                    </>
+                ) : (
+                    'Publish Product'
+                )}
+              </Button>
             </div>
           </form>
         </Form>
