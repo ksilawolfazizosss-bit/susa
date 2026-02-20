@@ -15,14 +15,6 @@ export default function Home() {
       <main className="flex-1">
         <section className="relative flex items-center justify-center text-center bg-hero-pattern bg-cover bg-center min-h-screen">
             <div className="absolute inset-0 bg-background/70 backdrop-blur-sm" />
-            <div className="relative z-10 p-4">
-                <h1 className="font-headline text-5xl md:text-7xl tracking-tight drop-shadow-md text-primary">
-                    Elegance Redefined
-                </h1>
-                <p className="mt-4 text-lg md:text-xl max-w-2xl mx-auto drop-shadow-sm text-foreground/80">
-                    Discover pieces of unparalleled craftsmanship and timeless style.
-                </p>
-            </div>
         </section>
 
         <section className="container mx-auto px-4 py-12 md:py-20">
