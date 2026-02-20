@@ -5,13 +5,13 @@ import { formatPrice } from '@/lib/utils';
 
 export function ProductCard({ product }: { product: Product }) {
   return (
-    <Card className="w-full h-full overflow-hidden border border-primary/20 hover:border-primary/50 shadow-lg transition-all duration-300 group-hover:scale-105 group-hover:shadow-2xl bg-card">
+    <Card className="w-full h-full overflow-hidden transition-all duration-300 hover:shadow-xl">
       <div className="aspect-[3/4] relative">
         <Image
           src={product.imageUrl}
           alt={product.name || 'Product image'}
           fill
-          className="object-cover"
+          className="object-cover transition-transform duration-300 group-hover:scale-105"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         />
       </div>

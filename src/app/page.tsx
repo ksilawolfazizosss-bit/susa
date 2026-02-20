@@ -7,24 +7,47 @@ import { Footer } from '@/components/footer';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ProductGrid } from '@/components/product-grid';
+import Image from 'next/image';
 
 
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <main className="flex-1 container mx-auto px-4 py-8 md:py-12">
-        <div className="text-center mb-10 md:mb-16">
-          <h1 className="font-headline text-4xl md:text-5xl tracking-tight">
-            Our Collection
-          </h1>
-          <p className="mt-2 text-lg text-muted-foreground max-w-2xl mx-auto">
-            Discover pieces of unparalleled craftsmanship and timeless elegance.
-          </p>
-        </div>
-        <Suspense fallback={<ProductGridSkeleton />}>
-          <ProductGrid />
-        </Suspense>
+      <main className="flex-1">
+        <section className="relative h-[50vh] md:h-[60vh] flex items-center justify-center text-center text-white bg-secondary">
+            <Image 
+                src="https://picsum.photos/seed/fashion-hero/1920/1080"
+                alt="Stylish fashion collection"
+                fill
+                className="object-cover"
+                priority
+                data-ai-hint="fashion model"
+            />
+             <div className="absolute inset-0 bg-black/50" />
+            <div className="relative z-10 p-4">
+                <h1 className="font-headline text-5xl md:text-7xl tracking-tight drop-shadow-md">
+                    Elegance Redefined
+                </h1>
+                <p className="mt-4 text-lg md:text-xl max-w-2xl mx-auto drop-shadow-sm">
+                    Discover pieces of unparalleled craftsmanship and timeless style.
+                </p>
+            </div>
+        </section>
+
+        <section className="container mx-auto px-4 py-12 md:py-20">
+            <div className="text-center mb-10 md:mb-16">
+              <h2 className="font-headline text-4xl md:text-5xl tracking-tight">
+                Our Collection
+              </h2>
+              <p className="mt-2 text-lg text-muted-foreground max-w-2xl mx-auto">
+                Each piece is curated to bring you the best in modern luxury.
+              </p>
+            </div>
+            <Suspense fallback={<ProductGridSkeleton />}>
+              <ProductGrid />
+            </Suspense>
+        </section>
       </main>
       <Footer />
     </div>
@@ -35,7 +58,7 @@ function ProductGridSkeleton() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
       {Array.from({ length: 4 }).map((_, i) => (
-        <Card key={i} className="border border-primary/20 shadow-lg bg-card">
+        <Card key={i}>
           <Skeleton className="aspect-[3/4] w-full" />
           <div className="p-4 space-y-2">
             <Skeleton className="h-6 w-3/4" />

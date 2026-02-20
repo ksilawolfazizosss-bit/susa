@@ -69,6 +69,7 @@ export default function CheckoutPage() {
             router.push('/order-confirmation');
         })
         .catch((err) => {
+            console.error("Firebase Create Order Error:", err);
             const permissionError = new FirestorePermissionError({
                 path: 'orders',
                 operation: 'create',
@@ -78,8 +79,8 @@ export default function CheckoutPage() {
             setError('Could not place order. Please try again.');
             toast({
                 variant: 'destructive',
-                title: 'Error',
-                description: 'Could not place your order. Please check permissions and try again.',
+                title: 'Error Placing Order',
+                description: 'Could not save your order. Please check permissions and try again.',
             });
             setLoading(false);
         });
@@ -111,7 +112,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-muted/20">
+    <div className="flex flex-col min-h-screen bg-muted/40">
       <Header />
       <main className="flex-1 container mx-auto py-12 px-4">
         <div className="max-w-4xl mx-auto">
@@ -168,7 +169,7 @@ export default function CheckoutPage() {
 
 function CheckoutSkeleton() {
     return (
-        <div className="flex flex-col min-h-screen bg-muted/20">
+        <div className="flex flex-col min-h-screen bg-muted/40">
             <Header />
             <main className="flex-1 container mx-auto py-12 px-4">
                 <div className="max-w-4xl mx-auto">

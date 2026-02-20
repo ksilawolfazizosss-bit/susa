@@ -15,6 +15,7 @@ import { Input } from './ui/input';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
+import { Gem } from 'lucide-react';
 
 export function Header() {
   const [password, setPassword] = useState('');
@@ -23,10 +24,9 @@ export function Header() {
   const { toast } = useToast();
 
   const handlePasswordCheck = () => {
-    if (password === 'susan') {
-      // Simple hardcoded password
+    if (password === '2009') {
       router.push('/admin');
-      setOpen(false); // Close dialog on success
+      setOpen(false);
       setPassword('');
     } else {
       toast({
@@ -46,13 +46,16 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-primary/20 bg-background/80 backdrop-blur-sm">
+    <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-sm">
       <div className="container mx-auto flex h-20 items-center justify-center px-4">
         <Dialog open={open} onOpenChange={onDialogClose}>
           <DialogTrigger asChild>
-            <h1 className="font-headline text-4xl text-foreground hover:text-primary transition-colors duration-300 cursor-pointer">
-              Susan Fashion
-            </h1>
+            <div className="flex items-center gap-2 text-foreground hover:text-primary transition-colors duration-300 cursor-pointer">
+              <Gem className="h-8 w-8" />
+              <h1 className="font-headline text-4xl">
+                Susan Fashion
+              </h1>
+            </div>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>

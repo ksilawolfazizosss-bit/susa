@@ -51,6 +51,7 @@ export default function AdminPage() {
         });
       })
       .catch((err) => {
+        console.error("Firebase Add Product Error:", err);
         const permissionError = new FirestorePermissionError({
             path: 'products',
             operation: 'create',
@@ -59,8 +60,8 @@ export default function AdminPage() {
         errorEmitter.emit('permission-error', permissionError);
         toast({
           variant: "destructive",
-          title: "Uh oh! Something went wrong.",
-          description: "Could not add product. Check permissions.",
+          title: "Failed to Save Product",
+          description: "There was an error saving the product. Please check your Firestore rules and database setup.",
         });
       });
   };
@@ -76,6 +77,7 @@ export default function AdminPage() {
         });
       })
       .catch((err) => {
+        console.error("Firebase Delete Product Error:", err);
         const permissionError = new FirestorePermissionError({
             path: `products/${productId}`,
             operation: 'delete',
@@ -83,29 +85,27 @@ export default function AdminPage() {
         errorEmitter.emit('permission-error', permissionError);
         toast({
           variant: 'destructive',
-          title: 'Error',
-          description: 'Could not delete the product. Check permissions.',
+          title: 'Error Deleting Product',
+          description: 'Could not delete the product. Please check your Firestore rules.',
         });
       });
   };
 
 
   return (
-    <div className="min-h-screen bg-muted/20">
-      <header className="bg-background border-b sticky top-0 z-10">
-        <div className="container mx-auto flex items-center justify-between h-20 px-4">
-            <Button asChild variant="outline" size="sm">
+    <div className="min-h-screen bg-muted/40">
+      <main className="container mx-auto py-8 px-4">
+        <div className="flex items-center justify-between mb-8">
+            <h1 className="font-headline text-4xl">Admin Panel</h1>
+            <Button asChild variant="outline">
                 <Link href="/">
-                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    <ArrowLeft className="mr-2" />
                     Back to Store
                 </Link>
             </Button>
-            <h1 className="font-headline text-2xl md:text-3xl">Admin Panel</h1>
-            <div className="w-24"></div>
         </div>
-      </header>
-      <main className="container mx-auto py-8 px-4">
-        <Tabs defaultValue="products" className="max-w-4xl mx-auto">
+        
+        <Tabs defaultValue="products" className="max-w-5xl mx-auto">
             <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="products">
                     <Package className="mr-2" />
