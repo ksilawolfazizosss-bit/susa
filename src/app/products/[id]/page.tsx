@@ -46,6 +46,7 @@ export default function ProductPage() {
               alt={product.name!}
               fill
               className="object-cover"
+              sizes="(max-width: 768px) 100vw, 50vw"
               priority
             />
           </div>
@@ -57,10 +58,10 @@ export default function ProductPage() {
 
             {product.colors && product.colors.length > 0 && (
               <div className="mb-6">
-                <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-3">Color</h3>
-                <div className="flex items-center gap-2">
+                <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-3">Available Colors</h3>
+                <div className="flex items-center gap-2 flex-wrap">
                   {product.colors.map(color => (
-                     <Badge key={color} variant="outline" className="px-3 py-1 text-sm">{color}</Badge>
+                     <Badge key={color} variant="outline" className="px-3 py-1 text-base">{color}</Badge>
                   ))}
                 </div>
               </div>
@@ -68,19 +69,12 @@ export default function ProductPage() {
             
             {product.sizes && product.sizes.length > 0 && (
               <div className="mb-6">
-                <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-3">Size</h3>
+                <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-3">Available Sizes</h3>
                 <div className="flex flex-wrap gap-2">
-                  {product.sizes.map(size => <Badge key={size} variant="outline" className="px-3 py-1 text-sm">{size}</Badge>)}
+                  {product.sizes.map(size => <Badge key={size} variant="outline" className="px-3 py-1 text-base">{size}</Badge>)}
                 </div>
               </div>
             )}
-            
-            <Separator className="my-6" />
-
-            <div className="prose prose-neutral dark:prose-invert max-w-none mb-8">
-              <h3 className="font-headline text-xl">Description</h3>
-              <p>{product.description}</p>
-            </div>
             
             <div className="mt-auto pt-6">
               <Button asChild size="lg" className="w-full text-lg py-7">
@@ -114,14 +108,14 @@ function ProductPageSkeleton() {
                     <Skeleton className="h-8 w-16" />
                 </div>
             </div>
-            <Separator />
-            <div className="space-y-2">
-                <Skeleton className="h-6 w-1/4" />
-                <Skeleton className="h-5 w-full" />
-                <Skeleton className="h-5 w-full" />
-                <Skeleton className="h-5 w-2/3" />
+             <div className="space-y-4">
+                <Skeleton className="h-6 w-1/5" />
+                <div className="flex gap-2">
+                    <Skeleton className="h-8 w-16" />
+                    <Skeleton className="h-8 w-16" />
+                </div>
             </div>
-            <div className="pt-6">
+            <div className="pt-6 mt-auto">
                 <Skeleton className="h-14 w-full" />
             </div>
           </div>

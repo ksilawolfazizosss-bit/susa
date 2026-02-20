@@ -36,19 +36,17 @@ export default function AdminPage() {
 
   const { toast } = useToast();
 
-  const handleAddProduct = (newProductData: ProductFormValues) => {
+  const handleAddProduct = (newProductData: ProductFormValues, imageData: string) => {
     if (!firestore) return;
 
     const productCollection = collection(firestore, "products");
+    
     const productData = {
       name: newProductData.name,
       price: newProductData.price,
-      category: newProductData.category,
-      description: newProductData.description,
-      imageUrl: newProductData.image,
-      sizes: newProductData.sizes?.split(',').map(s => s.trim()).filter(Boolean) || [],
-      colors: newProductData.colors?.split(',').map(c => c.trim()).filter(Boolean) || [],
-      keyFeatures: newProductData.keyFeatures?.split(',').map(s => s.trim()).filter(Boolean) || [],
+      imageUrl: imageData,
+      sizes: newProductData.sizes.split(',').map(s => s.trim()).filter(Boolean),
+      colors: newProductData.colors.split(',').map(c => c.trim()).filter(Boolean),
     };
 
     addDoc(productCollection, productData)
@@ -59,16 +57,17 @@ export default function AdminPage() {
         });
       })
       .catch((err) => {
+        console.error("Error adding document: ", err);
         const permissionError = new FirestorePermissionError({
             path: 'products',
             operation: 'create',
-            requestResourceData: productData,
+            requestResourceData: { ...productData, imageUrl: '...omitted for brevity...' },
         });
         errorEmitter.emit('permission-error', permissionError);
         toast({
           variant: "destructive",
           title: "Failed to Save Product",
-          description: "There was an error saving the product. Please check your Firestore rules and database setup.",
+          description: "There was an error saving the product. This could be due to an image that is too large or a database permissions issue.",
         });
       });
   };

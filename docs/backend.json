@@ -13,22 +13,9 @@
           "type": "number",
           "description": "The price of the product."
         },
-        "category": {
-          "type": "string",
-          "description": "The category of the product."
-        },
-        "description": {
-          "type": "string",
-          "description": "A detailed description of the product."
-        },
         "imageUrl": {
           "type": "string",
-          "description": "The URL of the product image."
-        },
-        "keyFeatures": {
-            "type": "array",
-            "items": { "type": "string" },
-            "description": "A list of key features of the product."
+          "description": "The data URI of the product image."
         },
         "sizes": {
           "type": "array",
@@ -41,7 +28,7 @@
           "description": "Available colors for the product."
         }
       },
-      "required": ["name", "price", "description", "imageUrl"]
+      "required": ["name", "price", "imageUrl", "sizes", "colors"]
     },
     "Order": {
       "title": "Order",
