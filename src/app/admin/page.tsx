@@ -16,7 +16,6 @@ import { useFirestore } from "@/firebase";
 import type { Product, Order } from "@/types";
 import { errorEmitter } from "@/firebase/error-emitter";
 import { FirestorePermissionError } from "@/firebase/errors";
-import { optimizeProductImage } from "@/ai/flows/product-image-optimizer-flow";
 
 export default function AdminPage() {
   const firestore = useFirestore();
@@ -46,31 +45,13 @@ export default function AdminPage() {
       });
       throw new Error("Firestore not available");
     }
-
-    let optimizedImageData = imageData;
-    try {
-        toast({ title: "Optimizing Image...", description: "Please wait while we enhance your product photo."});
-        const optimizationResult = await optimizeProductImage({ photoDataUri: imageData });
-        optimizedImageData = optimizationResult.optimizedPhotoDataUri;
-        toast({
-            title: "Image Optimized!",
-            description: "Your product image has been prepared for the store.",
-        });
-    } catch (error) {
-        console.error("Image optimization failed:", error);
-        toast({
-            variant: "destructive",
-            title: "Image Optimization Failed",
-            description: "Saving the original image instead. This might fail if the image is too large.",
-        });
-    }
     
     const productCollection = collection(firestore, "products");
     
     const productData = {
       name: newProductData.name,
       price: newProductData.price,
-      imageUrl: optimizedImageData,
+      imageUrl: imageData,
       sizes: newProductData.sizes.split(',').map(s => s.trim()).filter(Boolean),
       colors: newProductData.colors.split(',').map(c => c.trim()).filter(Boolean),
     };
@@ -92,7 +73,7 @@ export default function AdminPage() {
         toast({
           variant: "destructive",
           title: "Failed to Save Product",
-          description: "There was an error saving the product. This could be due to a large image or database permissions issue.",
+          description: "There was an error saving the product. This is often due to a large image file. Please try a smaller image.",
         });
         throw err;
     }
