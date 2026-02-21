@@ -48,7 +48,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       </div>
       <audio
         ref={audioRef}
-        src="https://cdn.pixabay.com/download/audio/2022/10/19/audio_b88b3941a2.mp3"
+        src="https://cdn.pixabay.com/download/audio/2022/08/27/audio_51c6c97a5a.mp3"
         loop
         className="sr-only"
       />
