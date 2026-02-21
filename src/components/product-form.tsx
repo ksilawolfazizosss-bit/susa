@@ -48,11 +48,11 @@ export function ProductForm({ onProductAdd }: { onProductAdd: (data: ProductForm
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 4 * 1024 * 1024) { // 4MB limit
+      if (file.size > 10 * 1024 * 1024) { // 10MB limit
         toast({
           variant: "destructive",
           title: "Image too large",
-          description: "Please upload an image smaller than 4MB.",
+          description: "Please upload an image smaller than 10MB.",
         });
         e.target.value = ""; 
         return;
@@ -145,7 +145,7 @@ export function ProductForm({ onProductAdd }: { onProductAdd: (data: ProductForm
                             <div className="text-center text-muted-foreground">
                                 <UploadCloud className="mx-auto h-12 w-12" />
                                 <p className="mt-2">Click to upload or drag & drop</p>
-                                <p className="text-xs">PNG, JPG, WEBP up to 4MB</p>
+                                <p className="text-xs">PNG, JPG, WEBP up to 10MB</p>
                             </div>
                         )}
                          <FormControl>
