@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [hasEntered, setHasEntered] = useState(false);
-  const audioRef = useRef<HTMLAudioElement>(null);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -13,14 +12,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const handleEnter = () => {
     setHasEntered(true);
-    if (audioRef.current) {
-      // Set volume to a pleasant level
-      audioRef.current.volume = 0.3;
-      audioRef.current.play().catch(error => {
-        // Autoplay was prevented.
-        console.error("Audio playback failed:", error);
-      });
-    }
   };
 
   return (
@@ -46,12 +37,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       >
         {children}
       </div>
-      <audio
-        ref={audioRef}
-        src="https://cdn.pixabay.com/download/audio/2022/08/27/audio_51c6c97a5a.mp3"
-        loop
-        className="sr-only"
-      />
     </>
   );
 }
