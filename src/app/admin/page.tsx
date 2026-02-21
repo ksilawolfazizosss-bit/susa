@@ -12,13 +12,15 @@ import { OrderList } from "@/components/order-list";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCollection } from "@/firebase/firestore/use-collection";
 import { collection, addDoc, deleteDoc, doc } from "firebase/firestore";
-import { useFirestore } from "@/firebase";
+import { useFirestore, useStorage } from "@/firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import type { Product, Order } from "@/types";
 import { errorEmitter } from "@/firebase/error-emitter";
 import { FirestorePermissionError } from "@/firebase/errors";
 
 export default function AdminPage() {
   const firestore = useFirestore();
+  const storage = useStorage();
 
   const productsQuery = useMemo(
     () => (firestore ? collection(firestore, 'products') : null),
@@ -36,44 +38,59 @@ export default function AdminPage() {
 
   const { toast } = useToast();
 
-  const handleAddProduct = async (newProductData: ProductFormValues, imageData: string) => {
-    if (!firestore) {
+  const handleAddProduct = async (newProductData: ProductFormValues, imageFile: File) => {
+    if (!firestore || !storage) {
       toast({
         variant: "destructive",
-        title: "Database not connected",
+        title: "Database or Storage not connected",
         description: "Please try again later.",
       });
-      throw new Error("Firestore not available");
+      throw new Error("Firestore or Storage not available");
     }
     
-    const productCollection = collection(firestore, "products");
-    
-    const productData = {
-      name: newProductData.name,
-      price: newProductData.price,
-      imageUrl: imageData,
-      sizes: newProductData.sizes.split(',').map(s => s.trim()).filter(Boolean),
-      colors: newProductData.colors.split(',').map(c => c.trim()).filter(Boolean),
-    };
+    let imageUrl = '';
+    try {
+        // 1. Upload image to Firebase Storage
+        const imageRef = ref(storage, `products/${Date.now()}-${imageFile.name}`);
+        await uploadBytes(imageRef, imageFile);
+        imageUrl = await getDownloadURL(imageRef);
+    } catch (err: any) {
+        console.error("Error uploading image: ", err);
+        toast({
+          variant: "destructive",
+          title: "Image Upload Failed",
+          description: "Could not upload the product image. Please check your network connection and try again.",
+        });
+        throw err;
+    }
 
     try {
+        // 2. Prepare and add product document to Firestore
+        const productCollection = collection(firestore, "products");
+        const productData = {
+          name: newProductData.name,
+          price: newProductData.price,
+          imageUrl: imageUrl,
+          sizes: newProductData.sizes.split(',').map(s => s.trim()).filter(Boolean),
+          colors: newProductData.colors.split(',').map(c => c.trim()).filter(Boolean),
+        };
         await addDoc(productCollection, productData);
         toast({
             title: "Product Published!",
             description: "Your new product is now live in the store.",
         });
-    } catch (err) {
-        console.error("Error adding document: ", err);
+    } catch (err: any) {
+        console.error("Error saving product to Firestore: ", err);
         const permissionError = new FirestorePermissionError({
             path: 'products',
             operation: 'create',
-            requestResourceData: { ...productData, imageUrl: '...omitted for brevity...' },
+            requestResourceData: { name: newProductData.name, imageUrl },
         });
         errorEmitter.emit('permission-error', permissionError);
         toast({
           variant: "destructive",
-          title: "Failed to Save Product",
-          description: "There was an error saving the product. This is often due to a large image file. Please try a smaller image.",
+          title: "Failed to Save Product Data",
+          description: "Could not save product details to the database. Please check your permissions.",
         });
         throw err;
     }

@@ -29,9 +29,9 @@ const formSchema = z.object({
 
 export type ProductFormValues = z.infer<typeof formSchema>;
 
-export function ProductForm({ onProductAdd }: { onProductAdd: (data: ProductFormValues, imageData: string) => Promise<void> }) {
+export function ProductForm({ onProductAdd }: { onProductAdd: (data: ProductFormValues, imageFile: File) => Promise<void> }) {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [imageData, setImageData] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
@@ -57,17 +57,17 @@ export function ProductForm({ onProductAdd }: { onProductAdd: (data: ProductForm
         e.target.value = ""; 
         return;
       }
+      setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
-        setImageData(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
   };
 
   async function onSubmit(values: ProductFormValues) {
-    if (!imageData) {
+    if (!imageFile) {
         toast({
             variant: "destructive",
             title: "Image required",
@@ -78,10 +78,10 @@ export function ProductForm({ onProductAdd }: { onProductAdd: (data: ProductForm
 
     setIsSubmitting(true);
     try {
-      await onProductAdd(values, imageData);
+      await onProductAdd(values, imageFile);
       form.reset();
       setImagePreview(null);
-      setImageData(null);
+      setImageFile(null);
     } catch (error) {
         // Errors are handled and toasted by the parent `onProductAdd` function.
     } finally {
