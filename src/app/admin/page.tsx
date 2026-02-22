@@ -48,50 +48,48 @@ export default function AdminPage() {
       throw new Error("Firestore not available");
     }
     
-    setIsOptimizing(true);
-    let optimizedImageUri = '';
-    
-    try {
+    const dataUri = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
         reader.readAsDataURL(imageFile);
-        const dataUri = await new Promise<string>((resolve, reject) => {
-            reader.onload = () => resolve(reader.result as string);
-            reader.onerror = (error) => reject(error);
-        });
-      
-        const result = await optimizeProductImage({ imageDataUri: dataUri });
-        optimizedImageUri = result.optimizedImageDataUri;
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = (error) => reject(error);
+    });
 
+    let imageUrlForUpload = dataUri;
+
+    setIsOptimizing(true);
+    try {
+        const result = await optimizeProductImage({ imageDataUri: dataUri });
+        imageUrlForUpload = result.optimizedImageDataUri;
     } catch (e: any) {
         console.error("AI Optimization Error:", e);
         toast({
-            variant: "destructive",
-            title: "AI Image Optimization Failed",
-            description: e.message || "The AI could not process your image. Please try a different one.",
+            variant: "default",
+            title: "AI Optimization Skipped",
+            description: "Using original image. The AI service may be at its limit.",
         });
-        setIsOptimizing(false);
-        throw e;
     } finally {
         setIsOptimizing(false);
     }
     
-    try {
-        const productCollection = collection(firestore, "products");
-        const productData = {
-          name: newProductData.name,
-          price: newProductData.price,
-          imageUrl: optimizedImageUri, // Use the optimized data URI from the AI
-          sizes: newProductData.sizes.split(',').map(s => s.trim()).filter(Boolean),
-          colors: newProductData.colors.split(',').map(c => c.trim()).filter(Boolean),
-        };
-        await addDoc(productCollection, productData);
-        
+    const productCollection = collection(firestore, "products");
+    const productData = {
+      name: newProductData.name,
+      price: newProductData.price,
+      imageUrl: imageUrlForUpload, // Use the (potentially optimized) URL
+      sizes: newProductData.sizes.split(',').map(s => s.trim()).filter(Boolean),
+      colors: newProductData.colors.split(',').map(c => c.trim()).filter(Boolean),
+    };
+
+    return addDoc(productCollection, productData)
+      .then(() => {
         toast({
             title: "Product Published!",
             description: "Your new product is now live in the store.",
         });
         refetchProducts();
-    } catch (err: any) {
+      })
+      .catch((err: any) => {
         console.error("Error saving product to Firestore: ", err);
         const permissionError = new FirestorePermissionError({
             path: 'products',
@@ -105,7 +103,7 @@ export default function AdminPage() {
           description: "Could not save product details to the database. This is likely a permission issue.",
         });
         throw err;
-    }
+      });
   };
 
   const handleDeleteProduct = (productId: string) => {
