@@ -29,10 +29,9 @@ const formSchema = z.object({
 
 export type ProductFormValues = z.infer<typeof formSchema>;
 
-export function ProductForm({ onProductAdd, isSubmittingAI }: { onProductAdd: (data: ProductFormValues, imageFile: File) => Promise<void>, isSubmittingAI?: boolean }) {
+export function ProductForm({ onProductAdd, isPublishing }: { onProductAdd: (data: ProductFormValues, imageFile: File) => Promise<void>, isPublishing: boolean }) {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [isPublishing, setIsPublishing] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<ProductFormValues>({
@@ -48,8 +47,6 @@ export function ProductForm({ onProductAdd, isSubmittingAI }: { onProductAdd: (d
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // We let the AI handle optimization, so no strict size limit here,
-      // but it's good practice to have some client-side limit.
       if (file.size > 10 * 1024 * 1024) { // 10MB limit
         toast({
           variant: "destructive",
@@ -78,7 +75,6 @@ export function ProductForm({ onProductAdd, isSubmittingAI }: { onProductAdd: (d
         return;
     }
 
-    setIsPublishing(true);
     try {
       await onProductAdd(values, imageFile);
       form.reset();
@@ -87,12 +83,8 @@ export function ProductForm({ onProductAdd, isSubmittingAI }: { onProductAdd: (d
     } catch (error) {
         // Errors are handled and toasted by the parent `onProductAdd` function.
         console.error("Failed to add product:", error);
-    } finally {
-        setIsPublishing(false);
     }
   }
-
-  const isBusy = isPublishing || isSubmittingAI;
 
   return (
     <Card>
@@ -159,7 +151,7 @@ export function ProductForm({ onProductAdd, isSubmittingAI }: { onProductAdd: (d
                                 accept="image/png, image/jpeg, image/webp"
                                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                                 onChange={handleImageChange}
-                                disabled={isBusy}
+                                disabled={isPublishing}
                             />
                         </FormControl>
                     </div>
@@ -167,13 +159,8 @@ export function ProductForm({ onProductAdd, isSubmittingAI }: { onProductAdd: (d
             </div>
 
             <div className="flex justify-end">
-              <Button type="submit" size="lg" disabled={isBusy}>
-                {isSubmittingAI ? (
-                    <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Optimizing Image...
-                    </>
-                ) : isPublishing ? (
+              <Button type="submit" size="lg" disabled={isPublishing}>
+                {isPublishing ? (
                     <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Publishing...

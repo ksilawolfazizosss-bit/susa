@@ -12,15 +12,16 @@ import { OrderList } from "@/components/order-list";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCollection } from "@/firebase/firestore/use-collection";
 import { collection, addDoc, deleteDoc, doc } from "firebase/firestore";
-import { useFirestore } from "@/firebase";
+import { useFirestore, useStorage } from "@/firebase";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import type { Product, Order } from "@/types";
 import { errorEmitter } from "@/firebase/error-emitter";
 import { FirestorePermissionError } from "@/firebase/errors";
-import { optimizeProductImage } from "@/ai/flows/product-image-optimizer-flow";
 
 export default function AdminPage() {
   const firestore = useFirestore();
-  const [isOptimizing, setIsOptimizing] = useState(false);
+  const storage = useStorage();
+  const [isPublishing, setIsPublishing] = useState(false);
 
   const productsQuery = useMemo(
     () => (firestore ? collection(firestore, 'products') : null),
@@ -39,71 +40,71 @@ export default function AdminPage() {
   const { toast } = useToast();
 
   const handleAddProduct = async (newProductData: ProductFormValues, imageFile: File) => {
-    if (!firestore) {
+    if (!firestore || !storage) {
       toast({
         variant: "destructive",
-        title: "Database not connected",
+        title: "Services not connected",
         description: "Please try again later.",
       });
-      throw new Error("Firestore not available");
+      return;
     }
     
-    const dataUri = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(imageFile);
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = (error) => reject(error);
-    });
-
-    let imageUrlForUpload = dataUri;
-
-    setIsOptimizing(true);
+    setIsPublishing(true);
+    
     try {
-        const result = await optimizeProductImage({ imageDataUri: dataUri });
-        imageUrlForUpload = result.optimizedImageDataUri;
-    } catch (e: any) {
-        console.error("AI Optimization Error:", e);
-        toast({
-            variant: "default",
-            title: "AI Optimization Skipped",
-            description: "Using original image. The AI service may be at its limit.",
-        });
-    } finally {
-        setIsOptimizing(false);
-    }
-    
-    const productCollection = collection(firestore, "products");
-    const productData = {
-      name: newProductData.name,
-      price: newProductData.price,
-      imageUrl: imageUrlForUpload, // Use the (potentially optimized) URL
-      sizes: newProductData.sizes.split(',').map(s => s.trim()).filter(Boolean),
-      colors: newProductData.colors.split(',').map(c => c.trim()).filter(Boolean),
-    };
+        // 1. Upload image to Firebase Storage
+        const storageRef = ref(storage, `products/${Date.now()}_${imageFile.name}`);
+        await uploadBytes(storageRef, imageFile);
+        const downloadURL = await getDownloadURL(storageRef);
 
-    return addDoc(productCollection, productData)
-      .then(() => {
+        // 2. Prepare product data with the URL
+        const productCollection = collection(firestore, "products");
+        const productData = {
+          name: newProductData.name,
+          price: newProductData.price,
+          imageUrl: downloadURL,
+          sizes: newProductData.sizes.split(',').map(s => s.trim()).filter(Boolean),
+          colors: newProductData.colors.split(',').map(c => c.trim()).filter(Boolean),
+        };
+
+        // 3. Save product data to Firestore
+        await addDoc(productCollection, productData);
+
         toast({
             title: "Product Published!",
             description: "Your new product is now live in the store.",
         });
         refetchProducts();
-      })
-      .catch((err: any) => {
-        console.error("Error saving product to Firestore: ", err);
-        const permissionError = new FirestorePermissionError({
-            path: 'products',
-            operation: 'create',
-            requestResourceData: { name: newProductData.name }, // Don't log the full base64 string
-        });
+    } catch (err: any) {
+        console.error("Error saving product: ", err);
+        let permissionError;
+        if (err.code?.includes('storage')) {
+            permissionError = new FirestorePermissionError({
+                path: `products/${imageFile.name}`,
+                operation: 'create',
+            });
+             toast({
+              variant: "destructive",
+              title: "Failed to Upload Image",
+              description: "Could not upload the product image. Check storage permissions.",
+            });
+        } else {
+             permissionError = new FirestorePermissionError({
+                path: 'products',
+                operation: 'create',
+                requestResourceData: { name: newProductData.name },
+            });
+             toast({
+              variant: "destructive",
+              title: "Failed to Save Product",
+              description: "Could not save product details. Check database permissions.",
+            });
+        }
         errorEmitter.emit('permission-error', permissionError);
-        toast({
-          variant: "destructive",
-          title: "Failed to Save Product Data",
-          description: "Could not save product details to the database. This is likely a permission issue.",
-        });
         throw err;
-      });
+    } finally {
+        setIsPublishing(false);
+    }
   };
 
   const handleDeleteProduct = (productId: string) => {
@@ -159,7 +160,7 @@ export default function AdminPage() {
                  <div>
                     <h2 className="text-2xl font-headline mb-1">Add New Product</h2>
                     <p className="text-muted-foreground mb-6">Fill in the details below to add a new product to your store.</p>
-                    <ProductForm onProductAdd={handleAddProduct} isSubmittingAI={isOptimizing} />
+                    <ProductForm onProductAdd={handleAddProduct} isPublishing={isPublishing} />
                 </div>
 
                 <Separator />
